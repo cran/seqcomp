@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting started with seqcomp</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting started with seqcomp</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(seqcomp)</span></code></pre></div>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p><code>seqcomp</code> compares two sequential probabilistic
+forecasters.</p>
+<p>The basic question is:</p>
+<blockquote>
+<p>As outcomes arrive over time, is one forecaster consistently scoring
+better than the other?</p>
+</blockquote>
+<p>The package follows the convention that all scores are positively
+oriented: larger scores are better.</p>
+<p>For two forecasters <code>p</code> and <code>q</code>, the pointwise
+score difference is</p>
+<p><span class="math display">\[
+\hat{\delta}_t = S(p_t, y_t) - S(q_t, y_t).
+\]</span></p>
+<p>Positive values favour forecaster <code>p</code>; negative values
+favour forecaster <code>q</code>.</p>
+</div>
+<div id="a-simple-binary-forecasting-example" class="section level2">
+<h2>A simple binary forecasting example</h2>
+<p>Suppose we observe a sequence of binary outcomes.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">300</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.55</span>)</span></code></pre></div>
+<p>Now create two forecasters.</p>
+<p>Forecaster <code>p</code> is mildly informative: it tends to assign
+higher probability when the event occurs and lower probability when it
+does not.</p>
+<p>Forecaster <code>q</code> is less informative and stays closer to
+0.5.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(y <span class="sc">==</span> <span class="dv">1</span>, <span class="fl">0.62</span>, <span class="fl">0.38</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fl">0.50</span>, n)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">data.frame</span>(<span class="at">y =</span> y, <span class="at">p =</span> p, <span class="at">q =</span> q))</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;   y    p   q</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; 1 1 0.62 0.5</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; 2 1 0.62 0.5</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; 3 0 0.38 0.5</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; 4 0 0.38 0.5</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; 5 1 0.62 0.5</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; 6 0 0.38 0.5</span></span></code></pre></div>
+<p>This toy example is deliberately simple. In a real application,
+<code>p</code> and <code>q</code> would come from two forecasting
+models, analysts, or institutions.</p>
+</div>
+<div id="compare-the-forecasts" class="section level2">
+<h2>Compare the forecasts</h2>
+<p>The easiest workflow is to use <code>compare_forecasts()</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cmp <span class="ot">&lt;-</span> <span class="fu">compare_forecasts</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">p =</span> p,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">q =</span> q,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="at">y =</span> y,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">scoring_rule =</span> <span class="st">&quot;brier&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="fu">head</span>(cmp)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt;   t score_p score_q  delta estimate      lower     upper     e_pq         e_qp</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; 1 1 -0.1444   -0.25 0.1056   0.1056 -10.014906 10.226106 1.034560 9.495389e-01</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; 2 2 -0.1444   -0.25 0.1056   0.1056  -4.954653  5.165853 1.080177 9.099389e-01</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 3 3 -0.1444   -0.25 0.1056   0.1056  -3.267902  3.479102 1.128004 8.721567e-01</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 4 4 -0.1444   -0.25 0.1056   0.1056  -2.424527  2.635727 1.178151 8.361057e-01</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 5 5 -0.1444   -0.25 0.1056   0.1056  -1.918501  2.129701 1.230736 2.220446e-16</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; 6 6 -0.1444   -0.25 0.1056   0.1056  -1.581151  1.792351 1.285880 2.220446e-16</span></span></code></pre></div>
+<p>The output contains one row per time point.</p>
+<p>The most important columns are:</p>
+<ul>
+<li><code>score_p</code>: the score of forecaster <code>p</code>,</li>
+<li><code>score_q</code>: the score of forecaster <code>q</code>,</li>
+<li><code>delta</code>: the score difference
+<code>score_p - score_q</code>,</li>
+<li><code>estimate</code>: the running mean score difference,</li>
+<li><code>lower</code> and <code>upper</code>: the confidence
+sequence,</li>
+<li><code>e_pq</code> and <code>e_qp</code>: the two one-sided
+e-processes.</li>
+</ul>
+</div>
+<div id="interpreting-the-confidence-sequence" class="section level2">
+<h2>Interpreting the confidence sequence</h2>
+<p>The confidence sequence tracks the running average score
+advantage.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  cmp<span class="sc">$</span>t, cmp<span class="sc">$</span>estimate,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">ylim =</span> <span class="fu">range</span>(<span class="fu">c</span>(cmp<span class="sc">$</span>lower, cmp<span class="sc">$</span>upper, <span class="dv">0</span>), <span class="at">finite =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Time&quot;</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Mean score difference&quot;</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Sequential comparison using the Brier score&quot;</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="fu">lines</span>(cmp<span class="sc">$</span>t, cmp<span class="sc">$</span>lower, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">lines</span>(cmp<span class="sc">$</span>t, cmp<span class="sc">$</span>upper, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">&quot;gray50&quot;</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>If the whole interval lies above zero, the data favour
+<code>p</code>.</p>
+<p>If the whole interval lies below zero, the data favour
+<code>q</code>.</p>
+<p>If the interval still contains zero, the comparison is not yet
+decisive at the chosen level.</p>
+</div>
+<div id="interpreting-the-e-process" class="section level2">
+<h2>Interpreting the e-process</h2>
+<p>The e-process is an evidence process. Larger values mean stronger
+evidence against the corresponding null hypothesis.</p>
+<p>For a two-sided comparison at level <code>alpha</code>, the rejection
+threshold used by <code>eprocess()</code> is <code>2 / alpha</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>threshold <span class="ot">&lt;-</span> <span class="dv">2</span> <span class="sc">/</span> alpha</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>threshold</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; [1] 40</span></span></code></pre></div>
+<p>The column <code>e_pq</code> gives evidence that <code>p</code>
+outperforms <code>q</code>.</p>
+<p>The column <code>e_qp</code> gives evidence that <code>q</code>
+outperforms <code>p</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">plot</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  cmp<span class="sc">$</span>t, cmp<span class="sc">$</span>e_pq,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">log =</span> <span class="st">&quot;y&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;Time&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;e-process value&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">&quot;Evidence that p outperforms q&quot;</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> threshold, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">&quot;gray50&quot;</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>We can summarize rejection times with
+<code>eprocess_rejections()</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">eprocess_rejections</span>(cmp, <span class="at">alpha =</span> alpha)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; $threshold</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1] 40</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; $tau_pq</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt; [1] 79</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; $tau_qp</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; [1] NA</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt; $reject_pq</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; $reject_qp</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
+</div>
+<div id="using-lower-level-functions-directly" class="section level2">
+<h2>Using lower-level functions directly</h2>
+<p>The wrapper is convenient, but the package also exposes the
+individual pieces.</p>
+<p>First compute the scores.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>score_p <span class="ot">&lt;-</span> <span class="fu">brier_score</span>(p, y)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>score_q <span class="ot">&lt;-</span> <span class="fu">brier_score</span>(q, y)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="fu">head</span>(score_p)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; [1] -0.1444 -0.1444 -0.1444 -0.1444 -0.1444 -0.1444</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="fu">head</span>(score_q)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; [1] -0.25 -0.25 -0.25 -0.25 -0.25 -0.25</span></span></code></pre></div>
+<p>Then construct a confidence sequence.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>cs <span class="ot">&lt;-</span> <span class="fu">cs_bernstein</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="at">scores1 =</span> score_p,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">scores2 =</span> score_q,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fl">0.05</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">c =</span> <span class="dv">2</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">head</span>(cs)</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt;   t estimate      lower     upper</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 1 1   0.1056 -10.014906 10.226106</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 2 2   0.1056  -4.954653  5.165853</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 3 3   0.1056  -3.267902  3.479102</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 4 4   0.1056  -2.424527  2.635727</span></span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a><span class="co">#&gt; 5 5   0.1056  -1.918501  2.129701</span></span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a><span class="co">#&gt; 6 6   0.1056  -1.581151  1.792351</span></span></code></pre></div>
+<p>And construct an e-process.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>ep <span class="ot">&lt;-</span> <span class="fu">eprocess</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">scores1 =</span> score_p,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">scores2 =</span> score_q,</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fl">0.05</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">c =</span> <span class="dv">2</span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="fu">head</span>(ep)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt;   t     e_pq         e_qp   log_e_pq     log_e_qp</span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; 1 1 1.034560 9.495389e-01 0.03397626  -0.05177881</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; 2 2 1.080177 9.099389e-01 0.07712494  -0.09437783</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; 3 3 1.128004 8.721567e-01 0.12044953  -0.13678622</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; 4 4 1.178151 8.361057e-01 0.16394647  -0.17900019</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; 5 5 1.230736 2.220446e-16 0.20761222 -36.04365339</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; 6 6 1.285880 2.220446e-16 0.25144328 -36.04365339</span></span></code></pre></div>
+<p>This gives the same core information as
+<code>compare_forecasts()</code>, but with more manual control.</p>
+</div>
+<div id="choosing-a-scoring-rule" class="section level2">
+<h2>Choosing a scoring rule</h2>
+<p>For binary probability forecasts, <code>&quot;brier&quot;</code> is the safest
+starting point.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>cmp_brier <span class="ot">&lt;-</span> <span class="fu">compare_forecasts</span>(p, q, y, <span class="at">scoring_rule =</span> <span class="st">&quot;brier&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">tail</span>(cmp_brier)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&gt;       t score_p score_q  delta estimate      lower     upper    e_pq</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&gt; 295 295 -0.1444   -0.25 0.1056   0.1056 0.07129320 0.1399068 2681618</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&gt; 296 296 -0.1444   -0.25 0.1056   0.1056 0.07140910 0.1397909 2824574</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&gt; 297 297 -0.1444   -0.25 0.1056   0.1056 0.07152422 0.1396758 2975161</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; 298 298 -0.1444   -0.25 0.1056   0.1056 0.07163857 0.1395614 3133784</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; 299 299 -0.1444   -0.25 0.1056   0.1056 0.07175215 0.1394478 3300873</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; 300 300 -0.1444   -0.25 0.1056   0.1056 0.07186498 0.1393350 3476882</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&gt;             e_qp</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&gt; 295 2.220446e-16</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&gt; 296 2.220446e-16</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&gt; 297 2.220446e-16</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a><span class="co">#&gt; 298 2.220446e-16</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; 299 2.220446e-16</span></span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; 300 2.220446e-16</span></span></code></pre></div>
+<p>The spherical score is also bounded and can be used with
+finite-sample confidence sequences and e-processes.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>cmp_spherical <span class="ot">&lt;-</span> <span class="fu">compare_forecasts</span>(p, q, y, <span class="at">scoring_rule =</span> <span class="st">&quot;spherical&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">tail</span>(cmp_spherical)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt;       t   score_p   score_q     delta  estimate     lower     upper  e_pq</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; 295 295 0.8526013 0.7071068 0.1454945 0.1454945 0.1111877 0.1798013 1e+07</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; 296 296 0.8526013 0.7071068 0.1454945 0.1454945 0.1113036 0.1796854 1e+07</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; 297 297 0.8526013 0.7071068 0.1454945 0.1454945 0.1114187 0.1795702 1e+07</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; 298 298 0.8526013 0.7071068 0.1454945 0.1454945 0.1115330 0.1794559 1e+07</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; 299 299 0.8526013 0.7071068 0.1454945 0.1454945 0.1116466 0.1793423 1e+07</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; 300 300 0.8526013 0.7071068 0.1454945 0.1454945 0.1117595 0.1792295 1e+07</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt;             e_qp</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; 295 2.220446e-16</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt; 296 2.220446e-16</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; 297 2.220446e-16</span></span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a><span class="co">#&gt; 298 2.220446e-16</span></span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a><span class="co">#&gt; 299 2.220446e-16</span></span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a><span class="co">#&gt; 300 2.220446e-16</span></span></code></pre></div>
+<p>The logarithmic score is unbounded. Therefore
+<code>compare_forecasts()</code> uses an asymptotic confidence sequence
+by default and does not compute an e-process.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>cmp_log <span class="ot">&lt;-</span> <span class="fu">compare_forecasts</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">p =</span> p,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">q =</span> q,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="at">y =</span> y,</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="at">scoring_rule =</span> <span class="st">&quot;log&quot;</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  <span class="at">compute_e =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>)</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="fu">tail</span>(cmp_log)</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a><span class="co">#&gt;       t    score_p    score_q     delta  estimate     lower     upper e_pq e_qp</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="co">#&gt; 295 295 -0.4780358 -0.6931472 0.2151114 0.2151114 0.1640597 0.2661631   NA   NA</span></span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a><span class="co">#&gt; 296 296 -0.4780358 -0.6931472 0.2151114 0.2151114 0.1642322 0.2659906   NA   NA</span></span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a><span class="co">#&gt; 297 297 -0.4780358 -0.6931472 0.2151114 0.2151114 0.1644035 0.2658193   NA   NA</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co">#&gt; 298 298 -0.4780358 -0.6931472 0.2151114 0.2151114 0.1645736 0.2656491   NA   NA</span></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a><span class="co">#&gt; 299 299 -0.4780358 -0.6931472 0.2151114 0.2151114 0.1647427 0.2654801   NA   NA</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a><span class="co">#&gt; 300 300 -0.4780358 -0.6931472 0.2151114 0.2151114 0.1649106 0.2653122   NA   NA</span></span></code></pre></div>
+<p>For binary log-score comparisons where the Winkler construction is
+appropriate, use <code>winkler_compare()</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>wcmp <span class="ot">&lt;-</span> <span class="fu">winkler_compare</span>(p, q, y)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="fu">names</span>(wcmp)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;winkler_scores&quot; &quot;cs&quot;             &quot;etest_p_worse&quot;  &quot;etest_q_worse&quot; </span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co">#&gt; [5] &quot;rejections&quot;</span></span></code></pre></div>
+</div>
+<div id="practical-guidance" class="section level2">
+<h2>Practical guidance</h2>
+<p>Use <code>compare_forecasts()</code> for the common workflow.</p>
+<p>Use the lower-level functions when you want more control over the
+scoring rule, confidence sequence, e-process, lag handling, or
+predictable bounds.</p>
+<p>For bounded binary or categorical scores such as Brier and spherical
+scores, finite-sample confidence sequences and e-processes are
+available.</p>
+<p>For unbounded scores such as the log score, QLIKE, tick loss, and
+CRPS, be more careful. Use asymptotic confidence sequences, Winkler
+scores where applicable, or problem-specific predictable bounds.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

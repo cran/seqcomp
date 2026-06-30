@@ -1,0 +1,94 @@
+bibentry(
+  bibtype = "Manual",
+  title   = "seqcomp: Sequential Comparison of Probabilistic Forecasts",
+  author  = person("Akbar", "Alasgarli"),
+  year    = "2026",
+  note    = paste(
+    "R package version 0.1.0.",
+    "The implementation was developed with reference to the arXiv version of",
+    "Choe and Ramdas (2024), which contains appendix material with additional",
+    "formulae, proofs, and definitions used in the implementation.",
+    "The main citation refers to the published Operations Research version."
+  ),
+  url     = "https://github.com/alasgarliakbar/seqcomp"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "Comparing Sequential Forecasters",
+  author  = c(
+    person("Yo Joong", "Choe"),
+    person("Aaditya", "Ramdas")
+  ),
+  journal = "Operations Research",
+  year    = "2024",
+  volume  = "72",
+  number  = "4",
+  pages   = "1368--1387",
+  doi     = "10.1287/opre.2021.0792"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "Time-uniform, nonparametric, nonasymptotic confidence sequences",
+  author  = c(
+    person("Steven R.", "Howard"),
+    person("Aaditya", "Ramdas"),
+    person("Jon", "McAuliffe"),
+    person("Jasjeet", "Sekhon")
+  ),
+  journal = "The Annals of Statistics",
+  year    = "2021",
+  volume  = "49",
+  number  = "2",
+  doi     = "10.1214/20-AOS1991"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "Time-uniform Chernoff bounds via nonnegative supermartingales",
+  author  = c(
+    person("Steven R.", "Howard"),
+    person("Aaditya", "Ramdas"),
+    person("Jon", "McAuliffe"),
+    person("Jasjeet", "Sekhon")
+  ),
+  journal = "Probability Surveys",
+  year    = "2020",
+  volume  = "17",
+  doi     = "10.1214/18-PS321"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "Game-Theoretic Statistics and Safe Anytime-Valid Inference",
+  author  = c(
+    person("Aaditya", "Ramdas"),
+    person("Peter", "Grünwald"),
+    person("Vladimir", "Vovk"),
+    person("Glenn", "Shafer")
+  ),
+  journal = "Statistical Science",
+  year    = "2023",
+  volume  = "38",
+  number  = "4",
+  pages   = "576--601",
+  doi     = "10.1214/23-STS894"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "Time-uniform central limit theory and asymptotic confidence sequences",
+  author  = c(
+    person("Ian", "Waudby-Smith"),
+    person("David", "Arbour"),
+    person("Ritwik", "Sinha"),
+    person("Edward H.", "Kennedy"),
+    person("Aaditya", "Ramdas")
+  ),
+  journal = "The Annals of Statistics",
+  year    = "2024",
+  volume  = "52",
+  number  = "6",
+  doi     = "10.1214/24-AOS2408"
+)

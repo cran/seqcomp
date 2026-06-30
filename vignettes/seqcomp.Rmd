@@ -1,0 +1,255 @@
+---
+title: "Getting started with seqcomp"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with seqcomp}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(seqcomp)
+```
+
+## Overview
+
+`seqcomp` compares two sequential probabilistic forecasters.
+
+The basic question is:
+
+> As outcomes arrive over time, is one forecaster consistently scoring better
+> than the other?
+
+The package follows the convention that all scores are positively oriented:
+larger scores are better.
+
+For two forecasters `p` and `q`, the pointwise score difference is
+
+\[
+\hat{\delta}_t = S(p_t, y_t) - S(q_t, y_t).
+\]
+
+Positive values favour forecaster `p`; negative values favour forecaster `q`.
+
+## A simple binary forecasting example
+
+Suppose we observe a sequence of binary outcomes.
+
+```{r}
+set.seed(1)
+
+n <- 300
+y <- rbinom(n, size = 1, prob = 0.55)
+```
+
+Now create two forecasters.
+
+Forecaster `p` is mildly informative: it tends to assign higher probability
+when the event occurs and lower probability when it does not.
+
+Forecaster `q` is less informative and stays closer to 0.5.
+
+```{r}
+p <- ifelse(y == 1, 0.62, 0.38)
+q <- rep(0.50, n)
+
+head(data.frame(y = y, p = p, q = q))
+```
+
+This toy example is deliberately simple. In a real application, `p` and `q`
+would come from two forecasting models, analysts, or institutions.
+
+## Compare the forecasts
+
+The easiest workflow is to use `compare_forecasts()`.
+
+```{r}
+cmp <- compare_forecasts(
+  p = p,
+  q = q,
+  y = y,
+  scoring_rule = "brier"
+)
+
+head(cmp)
+```
+
+The output contains one row per time point.
+
+The most important columns are:
+
+- `score_p`: the score of forecaster `p`,
+- `score_q`: the score of forecaster `q`,
+- `delta`: the score difference `score_p - score_q`,
+- `estimate`: the running mean score difference,
+- `lower` and `upper`: the confidence sequence,
+- `e_pq` and `e_qp`: the two one-sided e-processes.
+
+## Interpreting the confidence sequence
+
+The confidence sequence tracks the running average score advantage.
+
+```{r}
+plot(
+  cmp$t, cmp$estimate,
+  type = "l",
+  ylim = range(c(cmp$lower, cmp$upper, 0), finite = TRUE),
+  xlab = "Time",
+  ylab = "Mean score difference",
+  main = "Sequential comparison using the Brier score"
+)
+lines(cmp$t, cmp$lower, lty = 2)
+lines(cmp$t, cmp$upper, lty = 2)
+abline(h = 0, col = "gray50")
+```
+
+If the whole interval lies above zero, the data favour `p`.
+
+If the whole interval lies below zero, the data favour `q`.
+
+If the interval still contains zero, the comparison is not yet decisive at the
+chosen level.
+
+## Interpreting the e-process
+
+The e-process is an evidence process. Larger values mean stronger evidence
+against the corresponding null hypothesis.
+
+For a two-sided comparison at level `alpha`, the rejection threshold used by
+`eprocess()` is `2 / alpha`.
+
+```{r}
+alpha <- 0.05
+threshold <- 2 / alpha
+
+threshold
+```
+
+The column `e_pq` gives evidence that `p` outperforms `q`.
+
+The column `e_qp` gives evidence that `q` outperforms `p`.
+
+```{r}
+plot(
+  cmp$t, cmp$e_pq,
+  type = "l",
+  log = "y",
+  xlab = "Time",
+  ylab = "e-process value",
+  main = "Evidence that p outperforms q"
+)
+abline(h = threshold, lty = 2, col = "gray50")
+```
+
+We can summarize rejection times with `eprocess_rejections()`.
+
+```{r}
+eprocess_rejections(cmp, alpha = alpha)
+```
+
+## Using lower-level functions directly
+
+The wrapper is convenient, but the package also exposes the individual pieces.
+
+First compute the scores.
+
+```{r}
+score_p <- brier_score(p, y)
+score_q <- brier_score(q, y)
+
+head(score_p)
+head(score_q)
+```
+
+Then construct a confidence sequence.
+
+```{r}
+cs <- cs_bernstein(
+  scores1 = score_p,
+  scores2 = score_q,
+  alpha = 0.05,
+  c = 2
+)
+
+head(cs)
+```
+
+And construct an e-process.
+
+```{r}
+ep <- eprocess(
+  scores1 = score_p,
+  scores2 = score_q,
+  alpha = 0.05,
+  c = 2
+)
+
+head(ep)
+```
+
+This gives the same core information as `compare_forecasts()`, but with more
+manual control.
+
+## Choosing a scoring rule
+
+For binary probability forecasts, `"brier"` is the safest starting point.
+
+```{r}
+cmp_brier <- compare_forecasts(p, q, y, scoring_rule = "brier")
+tail(cmp_brier)
+```
+
+The spherical score is also bounded and can be used with finite-sample
+confidence sequences and e-processes.
+
+```{r}
+cmp_spherical <- compare_forecasts(p, q, y, scoring_rule = "spherical")
+tail(cmp_spherical)
+```
+
+The logarithmic score is unbounded. Therefore `compare_forecasts()` uses an
+asymptotic confidence sequence by default and does not compute an e-process.
+
+```{r}
+cmp_log <- compare_forecasts(
+  p = p,
+  q = q,
+  y = y,
+  scoring_rule = "log",
+  compute_e = FALSE
+)
+
+tail(cmp_log)
+```
+
+For binary log-score comparisons where the Winkler construction is appropriate,
+use `winkler_compare()`.
+
+```{r}
+wcmp <- winkler_compare(p, q, y)
+
+names(wcmp)
+```
+
+## Practical guidance
+
+Use `compare_forecasts()` for the common workflow.
+
+Use the lower-level functions when you want more control over the scoring rule,
+confidence sequence, e-process, lag handling, or predictable bounds.
+
+For bounded binary or categorical scores such as Brier and spherical scores,
+finite-sample confidence sequences and e-processes are available.
+
+For unbounded scores such as the log score, QLIKE, tick loss, and CRPS, be more
+careful. Use asymptotic confidence sequences, Winkler scores where applicable,
+or problem-specific predictable bounds.
