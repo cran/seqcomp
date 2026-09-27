@@ -1,17 +1,26 @@
 Package: seqcomp
 Type: Package
 Title: Sequential Comparison of Probabilistic Forecasts
-Version: 0.1.0
+Version: 0.3.0
 Authors@R: person(
     "Akbar", "Alasgarli",
     email = "alasgarliakbar@gmail.com",
     role = c("aut", "cre"))
-Description: Implements tools for sequential comparison of probabilistic
-    forecasts, including binary and categorical scoring rules, anytime-valid
-    confidence sequences, e-processes, Winkler-score comparisons, lag handling,
-    and predictable-bound e-processes.
+Description: Implements tools for the anytime-valid sequential comparison of
+    two or more probabilistic forecasters. Provides binary, categorical, and
+    quantile scoring rules, together with finite-sample confidence sequences
+    and e-processes following Choe and Ramdas (2024)
+    <doi:10.1287/opre.2021.0792>. Extends to multi-model evaluation via
+    Sequential Model Confidence Sets, following Arnold, Gavrilopoulos, Schulz,
+    and Ziegel (2026) <doi:10.1093/jrsssb/qkag066>, using closure principles,
+    joint confidence sequences, and accelerated closed-testing. Adaptive
+    betting fractions for the strong null (aGRAPA and ONS-m) are adapted from
+    Waudby-Smith and Ramdas (2024) <doi:10.1093/jrsssb/qkad009>. Also includes
+    Winkler-score comparisons, lag handling, and predictable-bound betting
+    e-processes.
 License: MIT + file LICENSE
-URL: https://github.com/alasgarliakbar/seqcomp
+URL: https://github.com/alasgarliakbar/seqcomp,
+        https://alasgarliakbar.github.io/seqcomp/
 BugReports: https://github.com/alasgarliakbar/seqcomp/issues
 Encoding: UTF-8
 RoxygenNote: 7.3.3
@@ -21,8 +30,8 @@ Suggests: scoringRules, VGAM, testthat (>= 3.0.0), knitr, rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2026-06-24 15:35:04 UTC; hp
+Packaged: 2026-09-27 16:46:19 UTC; hp
 Author: Akbar Alasgarli [aut, cre]
 Maintainer: Akbar Alasgarli <alasgarliakbar@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-06-30 12:20:02 UTC
+Date/Publication: 2026-09-27 22:50:02 UTC

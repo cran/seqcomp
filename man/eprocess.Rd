@@ -2,7 +2,7 @@
 % Please edit documentation in R/etests.R
 \name{eprocess}
 \alias{eprocess}
-\title{Sub-exponential mixture e-process (Theorem 3, Choe & Ramdas 2023)}
+\title{Sub-exponential mixture e-process (Theorem 3, Choe & Ramdas 2024)}
 \usage{
 eprocess(
   scores1,
@@ -29,7 +29,7 @@ For score differences in \verb{[-(b-a), b-a]}: c = 2*(b-a).
 Default: 2 (for Brier score differences in \verb{[-1,1]}).}
 
 \item{v_opt}{Numeric > 0. Intrinsic time at which e-process grows
-fastest. Default: 10 (recommended by CR23).}
+fastest. Default: 10 (recommended by CR24).}
 
 \item{alpha_opt}{Numeric in (0,1). One-sided alpha used to compute rho.
 Default: alpha/2 (matches comparecast two-sided convention).}
@@ -41,7 +41,15 @@ If NULL, constructed as lagged running mean.}
 Default: 1e7 (matches Python comparecast).}
 }
 \value{
-data.frame with columns t, e_pq, e_qp, log_e_pq, log_e_qp.
+data.frame with the following columns:
+\describe{
+\item{\code{t}}{Time index.}
+\item{\code{e_pq}, \code{e_qp}}{One-sided e-processes. \code{e_pq} tests H_0^w(p, q):
+whether forecaster \code{p} outperforms \code{q}; \code{e_qp} tests H_0^w(q, p): whether
+forecaster \code{q} outperforms \code{p}.}
+\item{\code{log_e_pq}, \code{log_e_qp}}{Log-scale values of the e-processes, clipped
+at log(clip_max).}
+}
 }
 \description{
 Constructs two simultaneous one-sided e-processes for sequentially testing
@@ -52,14 +60,15 @@ The mixture e-process at time t is:
 \deqn{E_t^{\mathrm{mix}} = m(S_t, \hat{V}_t)}
 where \eqn{S_t = \sum_{i=1}^t \hat{\delta}_i},
 \eqn{\hat{V}_t = \sum_{i=1}^t (\hat{\delta}_i - \gamma_i)^2},
-and \eqn{m(s, v)} is the Gamma-Exponential mixture function (Proposition 3, CR23).
+and \eqn{m(s, v)} is the Gamma-Exponential mixture function (Proposition EC.3,
+CR24).
 
-VARIANCE PROCESS: The intrinsic time V_hat_t uses NO floor (unlike the
-EB CS). The GE mixture m(s, v) is well-defined at v=0 (returns 1 when
-s=0), so no floor is needed. Adding a floor would distort e-values.
+VARIANCE PROCESS: The intrinsic time V_hat_t uses NO floor. The GE mixture
+m(s, v) is well-defined at v=0 (returns 1 when s=0), so no floor is needed.
+Adding a floor would yield less power in the e-process.
 
 SCALE CONVENTION: c is the sub-exponential scale parameter such that
-|hat_delta_i| <= c/2. This is the Theorems 2 & 3 convention from CR23.
+|hat_delta_i| <= c/2. This is the Theorems 2 & 3 convention from CR24.
 For Brier score differences in \verb{[-1,1]}: c = 2.
 For Winkler scores (bounded above by 1): c = 2.
 

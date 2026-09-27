@@ -2,7 +2,7 @@
 % Please edit documentation in R/predictable_bounds.R
 \name{eprocess_predictable}
 \alias{eprocess_predictable}
-\title{Fixed-lambda e-process with predictable bounds (Proposition 7)}
+\title{Fixed-lambda e-process with predictable bounds (Proposition EC.7)}
 \usage{
 eprocess_predictable(
   scores1,

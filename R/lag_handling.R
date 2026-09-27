@@ -18,13 +18,13 @@
 # Both use a p-to-e calibration step.
 #
 # References:
-#   CR23  Choe & Ramdas (2023), Operations Research 72(4), Section 4.4
+#   CR24  Choe & Ramdas (2024), Operations Research 72(4), Section 4.4
 # =============================================================================
 
 #' Split a sequence into h interleaved lag streams
 #'
 #' For lag `h`, the k-th stream (`k = 1, ..., h`) contains indices
-#' \eqn{\{k,\, k+h,\, k+2h,\, \ldots\}}, following the CR23 convention.
+#' \eqn{\{k,\, k+h,\, k+2h,\, \ldots\}}, following the CR24 convention.
 #'
 #' @param xs  Numeric vector. Score differences hat_delta_t.
 #' @param h   Integer >= 1. Lag (number of steps ahead).
@@ -81,7 +81,7 @@ unroll_stream <- function(stream_vals, k, h, T_) {
 #' P-to-e calibrator
 #'
 #' Converts anytime-valid p-values to e-values using the mixture or simple
-#' calibrator, as used in CR23 Section 4.4.
+#' calibrator, as used in CR24 Section 4.4.
 #'
 #' @param p        Numeric vector of p-values in (0, 1].
 #' @param strategy Character. `"mixture"` (default, from Vovk & Wang 2021) or
@@ -149,7 +149,7 @@ calibrate_p_to_e <- function(p, strategy = "mixture", eps = 1e-16) {
 #'     5. Unroll to original time scale
 #'
 #'   The period-wise ("pw") null is less conservative than the standard ("w")
-#'   null but tests a different (weaker) hypothesis. See CR23 Section 4.4.
+#'   null but tests a different (weaker) hypothesis. See CR24 Section 4.4.
 #'
 #' @examples
 #' scores1 <- c(-0.04, -0.09, -0.01, -0.16, -0.04, -0.09)

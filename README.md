@@ -5,16 +5,25 @@
 
 <!-- badges: start -->
 
+[![CRAN
+status](https://www.r-pkg.org/badges/version/seqcomp)](https://cran.r-project.org/package=seqcomp)
 [![R-CMD-check](https://github.com/alasgarliakbar/seqcomp/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/alasgarliakbar/seqcomp/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://alasgarliakbar.github.io/seqcomp/)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-`seqcomp` implements anytime-valid tools for the sequential comparison
-of probabilistic forecasters, following the framework of Choe and Ramdas
+`seqcomp` is an R package for anytime-valid sequential comparison of
+probabilistic forecasters, implementing the framework of Choe and Ramdas
 (2024). Given two competing forecasters and a sequence of binary or
 categorical outcomes, the package constructs confidence sequences and
 e-processes for the running mean score difference that are valid
 simultaneously at every point in time, without requiring a pre-specified
-sample size or adjustment for repeated monitoring.
+sample size or adjustment for repeated monitoring. For three or more
+forecasters, `seqcomp` also implements Sequential Model Confidence Sets
+(Arnold, Gavrilopoulos, Schulz and Ziegel, 2026), which extend this
+guarantee to a running subset of models that have not yet been shown to
+underperform.
 
 The package provides:
 
@@ -30,6 +39,12 @@ The package provides:
   binary scoring rules.
 - Lag-handling utilities for multi-step-ahead forecast evaluation via
   stream splitting.
+- Sequential Model Confidence Sets (SMCS) for evaluating three or more
+  forecasters simultaneously, using closure-principle and
+  joint-confidence- sequence constructions.
+- Adaptive betting-fraction rules (aGRAPA, ONS-m) for the SMCS strong
+  null, adapting Waudby-Smith and Ramdas (2024) to a bounded,
+  predictable-bet setting.
 - Predictable-bounds tools for settings where score differences are not
   globally bounded in advance.
 
@@ -39,17 +54,17 @@ on the `confseq` package.
 
 ## Installation
 
+Available on CRAN:
+
+``` r
+install.packages("seqcomp")
+```
+
 The development version can be installed from GitHub:
 
 ``` r
 # install.packages("pak")
 pak::pak("alasgarliakbar/seqcomp")
-```
-
-After CRAN acceptance:
-
-``` r
-install.packages("seqcomp")
 ```
 
 ## Basic example
@@ -78,21 +93,21 @@ out <- compare_forecasts(
 
 tail(out[, c("t", "estimate", "lower", "upper", "e_pq", "e_qp")])
 #>       t estimate      lower     upper    e_pq         e_qp
-#> 295 295   0.1056 0.07129320 0.1399068 2681618 2.220446e-16
-#> 296 296   0.1056 0.07140910 0.1397909 2824574 2.220446e-16
-#> 297 297   0.1056 0.07152422 0.1396758 2975161 2.220446e-16
-#> 298 298   0.1056 0.07163857 0.1395614 3133784 2.220446e-16
-#> 299 299   0.1056 0.07175215 0.1394478 3300873 2.220446e-16
-#> 300 300   0.1056 0.07186498 0.1393350 3476882 2.220446e-16
+#> 295 295   0.1056 0.07758913 0.1336109 2681618 2.220446e-16
+#> 296 296   0.1056 0.07768377 0.1335162 2824574 2.220446e-16
+#> 297 297   0.1056 0.07777776 0.1334222 2975161 2.220446e-16
+#> 298 298   0.1056 0.07787112 0.1333289 3133784 2.220446e-16
+#> 299 299   0.1056 0.07796386 0.1332361 3300873 2.220446e-16
+#> 300 300   0.1056 0.07805598 0.1331440 3476882 2.220446e-16
 ```
 
 The column `estimate` is the running mean score difference
-$\hat{\Delta}_t = t^{-1}\sum_{i=1}^t (S(p_i, y_i) - S(q_i, y_i))$.
-Positive values favour `p`; negative values favour `q`. The columns
-`lower` and `upper` are the empirical Bernstein confidence sequence
-bounds. The columns `e_pq` and `e_qp` are the two one-sided e-process
-values; the two-sided rejection threshold at level `alpha = 0.05` is
-`2 / 0.05 = 40`.
+$\hat{\Delta}_t =
+\frac{1}{t}\sum_{i=1}^{t}(S(p_i,y_i)-S(q_i,y_i))$. Positive values
+favour `p`; negative values favour `q`. The columns `lower` and `upper`
+are the empirical Bernstein confidence sequence bounds. The columns
+`e_pq` and `e_qp` are the two one-sided e-process values; the two-sided
+rejection threshold at level `alpha = 0.05` is `2 / 0.05 = 40`.
 
 ``` r
 plot(
@@ -140,6 +155,36 @@ cs  <- cs_bernstein(scores_p, scores_q, alpha = 0.05, c = 2)
 ep  <- eprocess(scores_p, scores_q, alpha = 0.05, c = 2)
 ```
 
+## Comparing more than two forecasters
+
+For three or more candidate forecasters, use `smcs_compare()`, which
+extends the same anytime-valid guarantees to a Sequential Model
+Confidence Set (SMCS):
+
+``` r
+out <- smcs_compare(
+  forecasts    = cbind(p1, p2, p3),
+  outcomes     = y,
+  scoring_rule = "brier"
+)
+
+tail(out$smcs_strong)
+```
+
+See [the SMCS
+vignette](https://alasgarliakbar.github.io/seqcomp/articles/smcs.html)
+for the strong and weak notions of superiority, and the closed-testing
+multiplicity correction. Or, access it locally via
+`vignette("smcs", package = "seqcomp")`. `smcs_strong()`’s default
+betting fraction is the conservative fixed rule $\lambda_t = 1/(2c_t)$;
+adaptive alternatives (`lambda_betting_agrapa()`,
+`lambda_betting_ons()`) can substantially speed up rejection under
+autocorrelated or abruptly shifting score differences, at some cost in
+robustness elsewhere. See [the adaptive betting
+vignette](https://alasgarliakbar.github.io/seqcomp/articles/adaptive_betting.html)
+for a worked comparison, or
+`vignette("adaptive_betting", package = "seqcomp")` locally.
+
 ## Background
 
 The statistical methods in `seqcomp` are based on:
@@ -150,6 +195,8 @@ The statistical methods in `seqcomp` are based on:
   Shafer, 2023).
 - Sequential forecaster comparison under the weak null hypothesis (Choe
   and Ramdas, 2024).
+- Sequential model confidence sets for multi-model comparison (Arnold,
+  Gavrilopoulos, Schulz and Ziegel, 2026).
 
 The package was developed as part of a bachelor’s thesis at the Vienna
 University of Economics and Business (WU Vienna).
@@ -165,13 +212,19 @@ citation("seqcomp")
 
 ## References
 
+Arnold, S., Gavrilopoulos, G., Schulz, B. and Ziegel, J. (2026).
+Sequential model confidence sets. *Journal of the Royal Statistical
+Society Series B: Statistical Methodology*, qkag066.
+<https://doi.org/10.1093/jrsssb/qkag066>
+
 Choe, Y. J. and Ramdas, A. (2024). Comparing Sequential Forecasters.
 *Operations Research*, 72(4), 1368–1387.
 <https://doi.org/10.1287/opre.2021.0792>
 
 Howard, S. R., Ramdas, A., McAuliffe, J. and Sekhon, J. (2021).
 Time-uniform, nonparametric, nonasymptotic confidence sequences. *The
-Annals of Statistics*, 49(2). <https://doi.org/10.1214/20-AOS1991>
+Annals of Statistics*, 49(2), 1055–1080.
+<https://doi.org/10.1214/20-AOS1991>
 
 Howard, S. R., Ramdas, A., McAuliffe, J. and Sekhon, J. (2020).
 Time-uniform Chernoff bounds via nonnegative supermartingales.
@@ -183,5 +236,10 @@ statistics and safe anytime-valid inference. *Statistical Science*,
 
 Waudby-Smith, I., Arbour, D., Sinha, R., Kennedy, E. H. and Ramdas, A.
 (2024). Time-uniform central limit theory and asymptotic confidence
-sequences. *The Annals of Statistics*, 52(6).
+sequences. *The Annals of Statistics*, 52(6), 2613–2640.
 <https://doi.org/10.1214/24-AOS2408>
+
+Waudby-Smith, I., Ramdas, A. (2024). Estimating means of bounded random
+variables by betting. *Journal of the Royal Statistical Society Series
+B: Statistical Methodology*, 86(1), 1–27.
+<https://doi.org/10.1093/jrsssb/qkad009>

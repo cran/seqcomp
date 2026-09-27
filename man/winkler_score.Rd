@@ -27,7 +27,7 @@ Upper bound of 1 is tight: w = 1 when y = 1(p > q).
 \description{
 Normalises the score difference S(p,y) - S(q,y) by the maximum possible
 score difference given the forecaster ordering, mapping the result to
-\verb{(-Inf, 1]} (Proposition 4, Choe & Ramdas 2023). Used to apply Theorems 2 & 3
+\verb{(-Inf, 1]} (Proposition EC.4, Choe & Ramdas 2024). Used to apply Theorems 2 & 3
 to unbounded scoring rules on binary outcomes.
 }
 \details{
@@ -37,13 +37,13 @@ with the convention 0/0 := 0.
 The lower bound is problem-dependent (depends on how extreme p and q can
 be). For a two-sided CS via Corollary 2, the user must establish a finite
 lower bound analytically. If no finite lower bound can be guaranteed, use
-the one-sided (upper) CS only, as in the CR23 MLB experiments.
+the one-sided (upper) CS only, as in the CR24 MLB experiments.
 }
 \section{When to use}{
 
 Strictly limited to binary outcomes \code{y} in \verb{\{0, 1\}} and probability
 forecasts \code{p}, \code{q} in \verb{(0, 1)}. Not applicable to QLIKE or other
-continuous-outcome scoring rules. See CR23 Section G for discussion.
+continuous-outcome scoring rules. See CR24 EC.7 for discussion.
 
 For use in Theorems 2 & 3: upper bound = 1 implies c/2 = 1, so use \code{c = 2}
 in all GE boundary and e-process calls.

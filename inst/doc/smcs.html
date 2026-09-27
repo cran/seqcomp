@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Comparing Multiple Forecasters with SMCS</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Comparing Multiple Forecasters with
+SMCS</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(seqcomp)</span></code></pre></div>
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>While <code>compare_forecasts()</code> evaluates exactly two models,
+real-world applications often require comparing an arbitrary number of
+candidate models (<span class="math inline">\(m \ge 2\)</span>)
+simultaneously.</p>
+<p>Evaluating multiple models sequentially introduces a multiple-testing
+problem: if you run enough pairwise comparisons over enough time steps,
+you will eventually find false “statistically significant” differences
+by pure chance.</p>
+<p>To solve this, <code>seqcomp</code> implements <strong>Sequential
+Model Confidence Sets (SMCS)</strong> (Arnold et al., 2026). The SMCS is
+the set of models that have not yet been confidently beaten by any other
+model in the candidate pool. The package guarantees that the true best
+model(s) will remain in the SMCS with probability at least <span class="math inline">\(1 - \alpha\)</span> over the entire evaluation
+period. <em>(If you are only comparing two forecasters, we recommend
+starting with the <a href="seqcomp.html">introductory
+vignette</a>.)</em></p>
+</div>
+<div id="three-notions-of-superiority" class="section level2">
+<h2>Three Notions of Superiority</h2>
+<p>When comparing multiple models, <code>seqcomp</code> tracks three
+different definitions of what makes a model “superior”, following
+Arnold, Gavrilopoulos, Schulz and Ziegel (2026):</p>
+<ol style="list-style-type: decimal">
+<li><strong>The Strong Null
+(<code>smcs_strong(method = &quot;betting&quot;)</code>)</strong>: A model is
+strongly superior when, at every time step, its conditional expected
+score is at least as large as that of every competitor. The strong-null
+SMCS uses product-form betting e-processes and permanent exclusion.</li>
+<li><strong>The Uniformly Weak Null
+(<code>smcs_strong(method = &quot;mixture&quot;)</code>)</strong>: A model is
+uniformly weakly superior if its running average performance against
+every competitor, taken over the <em>entire</em> evaluation horizon so
+far, never falls behind. This uses the same closed-testing machinery as
+the strong null above (just built from exponential-mixture e-processes
+instead of the product-form martingale) so it also maintains a running
+intersection: once a model is excluded, it stays excluded.</li>
+<li><strong>The (Time-Varying) Weak Null
+(<code>smcs_weak()</code>)</strong>: A model is weakly superior <em>at
+time t</em> if its average performance against every competitor, taken
+over the horizon up to t, is not behind. Unlike the two notions above,
+this is re-evaluated fresh at each t from Bonferroni-adjusted pairwise
+confidence sequences, rather than from closed testing over e-processes.
+This is what lets a model exit and later re-enter the set as its average
+performance recovers. The strong and uniformly weak nulls never allow
+re-entry.</li>
+</ol>
+</div>
+<div id="a-simple-multi-model-example" class="section level2">
+<h2>A simple multi-model example</h2>
+<p>Let’s generate a sequence of binary outcomes and three candidate
+forecasters:</p>
+<ul>
+<li><code>M1</code>: A highly accurate forecaster.</li>
+<li><code>M2</code>: A mediocre forecaster that guesses randomly.</li>
+<li><code>M3</code>: A terrible forecaster that is consistently
+wrong.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>T_sim <span class="ot">&lt;-</span> <span class="dv">300</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(T_sim, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.7</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Create 3 forecasters</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>forecasts <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> T_sim, <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="fu">colnames</span>(forecasts) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>, <span class="st">&quot;M3&quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>forecasts[, <span class="st">&quot;M1&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(y <span class="sc">==</span> <span class="dv">1</span>, <span class="fl">0.8</span>, <span class="fl">0.2</span>)   <span class="co"># Highly accurate</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>forecasts[, <span class="st">&quot;M2&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">runif</span>(T_sim, <span class="fl">0.4</span>, <span class="fl">0.6</span>)     <span class="co"># Mediocre/random</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>forecasts[, <span class="st">&quot;M3&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(y <span class="sc">==</span> <span class="dv">1</span>, <span class="fl">0.2</span>, <span class="fl">0.8</span>)   <span class="co"># Consistently wrong</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">head</span>(forecasts)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="co">#&gt;       M1        M2  M3</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co">#&gt; [1,] 0.8 0.5019408 0.2</span></span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co">#&gt; [2,] 0.8 0.5009826 0.2</span></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a><span class="co">#&gt; [3,] 0.8 0.5262100 0.2</span></span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a><span class="co">#&gt; [4,] 0.8 0.4685904 0.2</span></span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a><span class="co">#&gt; [5,] 0.8 0.5677538 0.2</span></span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a><span class="co">#&gt; [6,] 0.8 0.4215049 0.2</span></span></code></pre></div>
+<p>This toy example is deliberately simple and outcome-conditioned. In a
+real application, forecasts would come from two forecasting models,
+analysts, or institutions, before observing <code>y</code>.</p>
+</div>
+<div id="compare-the-forecasts" class="section level2">
+<h2>Compare the forecasts</h2>
+<p>The easiest workflow for evaluating three or more models is to use
+<code>smcs_compare()</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>multi_cmp <span class="ot">&lt;-</span> <span class="fu">smcs_compare</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">forecasts =</span> forecasts,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">outcomes =</span> y,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">scoring_rule =</span> <span class="st">&quot;brier&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fl">0.05</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co"># Printing the object provides a clean summary of which models </span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co"># were excluded and when they first dropped out of the set.</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>multi_cmp</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; &lt;seqcomp multi-model comparison&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt;   3 models, 300 time steps, alpha = 0.05, scoring rule = &#39;brier&#39;, strong betting rule = &#39;naive&#39;</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; -- Strong-null SMCS (Permanent Exclusion) --</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt;  model status_at_T first_dropped</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt;     M1    included             -</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt;     M2    excluded            87</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt;     M3    excluded            33</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt;    final set size: 3 -&gt; 1</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; -- Uniformly-weak SMCS (Permanent Exclusion) --</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt;  model status_at_T first_dropped</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt;     M1    included             -</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt;     M2    excluded            50</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt;     M3    excluded            19</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt;    final set size: 3 -&gt; 1</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; -- Weak-null SMCS (Dynamic Re-entry) --</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt;  model status_at_T first_dropped</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt;     M1    included             -</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;     M2    excluded            61</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt;     M3    excluded            22</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;    final set size: 3 -&gt; 1</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; Use `x$smcs_strong`, `x$smcs_uniform_weak`, or `x$smcs_weak` for full  inclusion matrices, or `x$scores` for pointwise scores.</span></span></code></pre></div>
+<p>While the printed summary gives a quick overview, the underlying
+object is a list containing the full time-indexed matrices for further
+analysis (alongside metadata such as <code>alpha</code> and
+<code>scoring_rule</code>):</p>
+<ul>
+<li><code>multi_cmp$scores</code>: The evaluated pointwise scores for
+each model.</li>
+<li><code>multi_cmp$smcs_strong</code>: A logical matrix tracking
+whether each model belongs to the strong-null SMCS at time <span class="math inline">\(t\)</span>.</li>
+<li><code>multi_cmp$smcs_uniform_weak</code>: A logical matrix tracking
+whether each model belongs to the uniformly weak SMCS at time <span class="math inline">\(t\)</span>.</li>
+<li><code>multi_cmp$smcs_weak</code>: A logical matrix tracking whether
+each model belongs to the weak-null SMCS at time <span class="math inline">\(t\)</span>.</li>
+</ul>
+</div>
+<div id="interpreting-the-smcs-output" class="section level2">
+<h2>Interpreting the SMCS output</h2>
+<p><code>smcs_strong()</code> maintains a <strong>running
+intersection</strong> over time: once a model is shown to violate the
+null against some competitor, it is excluded permanently. This matches
+the strong/uniformly-weak SMCS construction of Arnold, Gavrilopoulos,
+Schulz and Ziegel (2026, Section 3.2).</p>
+<p>The underlying hypothesis of <code>smcs_weak()</code> (the
+<em>time-varying</em> weak null, Section 3.3) is defined <em>at</em>
+each time <span class="math inline">\(t\)</span>, not cumulatively, so a
+model’s average performance can legitimately recover after a bad
+stretch. <code>smcs_weak()</code> therefore returns <code>smcs</code>,
+which can re-admit models that were previously excluded.</p>
+<p>Let’s look at the strong SMCS at the end of the evaluation:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">tail</span>(multi_cmp<span class="sc">$</span>smcs_strong)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co">#&gt;          M1    M2    M3</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; [295,] TRUE FALSE FALSE</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; [296,] TRUE FALSE FALSE</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; [297,] TRUE FALSE FALSE</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; [298,] TRUE FALSE FALSE</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; [299,] TRUE FALSE FALSE</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; [300,] TRUE FALSE FALSE</span></span></code></pre></div>
+<p>We can visualize how the confidence set shrinks over time by plotting
+whether a model is <code>TRUE</code> (Included) or <code>FALSE</code>
+(Excluded):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>))</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;gray&quot;</span>, <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="fu">plot</span>(</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    <span class="dv">1</span><span class="sc">:</span>T_sim, multi_cmp<span class="sc">$</span>smcs_strong[, i], </span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, <span class="at">col =</span> colors[i], <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>    <span class="at">ylim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.1</span>, <span class="fl">1.1</span>), <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;In SMCS?&quot;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>    <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">&quot;Model:&quot;</span>, <span class="fu">colnames</span>(forecasts)[i])</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  )</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  <span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Excluded&quot;</span>, <span class="st">&quot;Included&quot;</span>), <span class="at">las =</span> <span class="dv">2</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>}</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>))</span></code></pre></div>
+<p>Notice how quickly the set shrinks:</p>
+<ol style="list-style-type: decimal">
+<li><code>M3</code> (the terrible model) is confidently beaten by
+<code>M1</code> almost immediately and drops out of the set.</li>
+<li><code>M2</code> (the mediocre model) survives a bit longer, but as
+evidence accumulates, it too is permanently excluded.</li>
+<li><code>M1</code> (the true best model) remains in the SMCS for the
+entire duration.</li>
+</ol>
+</div>
+<div id="using-lower-level-functions-directly" class="section level2">
+<h2>Using lower-level functions directly</h2>
+<p>Just like the two-model case, <code>seqcomp</code> exposes the
+underlying multi-model primitives if you need custom bounds, different
+scoring rules, or adaptive betting fractions.</p>
+<p>You can compute your own score matrices and pass them directly to
+<code>smcs_strong()</code> or <code>smcs_weak()</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Manually compute Brier scores</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>scores_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> T_sim, <span class="at">ncol =</span> <span class="dv">3</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) scores_mat[, i] <span class="ot">&lt;-</span> <span class="fu">brier_score</span>(forecasts[, i], y)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co"># Construct the Weak SMCS directly</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co"># Brier score differences are bounded in [-1, 1], so we use c_param = 2</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>res_weak <span class="ot">&lt;-</span> <span class="fu">smcs_weak</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="at">scores =</span> scores_mat,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="at">alpha =</span> <span class="fl">0.05</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="at">cs_method =</span> <span class="st">&quot;bernstein&quot;</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  <span class="at">c_param =</span> <span class="dv">2</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="fu">tail</span>(res_weak<span class="sc">$</span>smcs)</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt;        [,1]  [,2]  [,3]</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; [295,] TRUE FALSE FALSE</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; [296,] TRUE FALSE FALSE</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; [297,] TRUE FALSE FALSE</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; [298,] TRUE FALSE FALSE</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; [299,] TRUE FALSE FALSE</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; [300,] TRUE FALSE FALSE</span></span></code></pre></div>
+</div>
+<div id="adaptive-betting-fractions-for-the-strong-null" class="section level2">
+<h2>Adaptive betting fractions for the strong null</h2>
+<p>The strong-null e-process used by
+<code>smcs_strong(method = &quot;betting&quot;)</code> is a product-form betting
+martingale, <span class="math inline">\(E_t = \prod_{r \le t}(1 +
+\lambda_r d_r)\)</span>. Arnold et al. (2026) only require that <span class="math inline">\(\lambda_r\)</span> be predictable and lie in <span class="math inline">\([0, 1/c_r]\)</span> at every round;
+<code>smcs_strong()</code>’s default, if <code>lambda_param</code> is
+left <code>NULL</code>, is the conservative fixed fraction <span class="math inline">\(\lambda_r = 1/(2c_r)\)</span>.</p>
+<p><code>seqcomp</code> also provides two adaptive betting-fraction
+rules, <code>lambda_betting_agrapa()</code> and
+<code>lambda_betting_ons()</code>, which adapt the aGRAPA and ONS-m
+algorithms of Waudby-Smith and Ramdas (2024) to Arnold’s bounded
+strong-null setting. These adaptations are <strong>not</strong> given in
+Arnold et al. (2026) itself; they are original extensions implemented in
+this package (see the function documentation for the derivation.
+Additionally, see <a href="adaptive_betting.html">the adaptive betting
+vignette</a> for a comparison of performances under different temporal
+structures). <code>build_agrapa_betting_array()</code> and
+<code>build_ons_betting_array()</code> build the full <span class="math inline">\(T \times m \times m\)</span>
+<code>lambda_param</code> array these rules require:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>lam_agrapa <span class="ot">&lt;-</span> <span class="fu">build_agrapa_betting_array</span>(scores_mat, <span class="at">c_mat =</span> <span class="dv">2</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>res_strong_agrapa <span class="ot">&lt;-</span> <span class="fu">smcs_strong</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  scores_mat,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">alpha        =</span> <span class="fl">0.05</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="at">method       =</span> <span class="st">&quot;betting&quot;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  <span class="at">c_param      =</span> <span class="dv">2</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>  <span class="at">lambda_param =</span> lam_agrapa</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="fu">tail</span>(res_strong_agrapa<span class="sc">$</span>smcs)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt;        [,1]  [,2]  [,3]</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; [295,] TRUE FALSE FALSE</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt; [296,] TRUE FALSE FALSE</span></span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt; [297,] TRUE FALSE FALSE</span></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt; [298,] TRUE FALSE FALSE</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co">#&gt; [299,] TRUE FALSE FALSE</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; [300,] TRUE FALSE FALSE</span></span></code></pre></div>
+<p><code>build_ons_betting_array()</code> is a drop-in alternative using
+ONS-m instead of aGRAPA. Both accept a <code>period</code> argument: if
+competitors differ systematically by a known periodic covariate (for
+example, day-of-week seasonality), passing <code>period</code>
+conditions each rule on its own interleaved sub-stream rather than
+pooling across the full history. Pooling otherwise dilutes the adaptive
+rule’s ability to react to the periodic pattern, since the pooled
+running mean/variance stays governed by the majority (non-anomalous)
+observations:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>lam_agrapa_p7 <span class="ot">&lt;-</span> <span class="fu">build_agrapa_betting_array</span>(scores_mat, <span class="at">c_mat =</span> <span class="dv">2</span>, <span class="at">period =</span> <span class="dv">7</span>)</span></code></pre></div>
+<p>This <code>period</code> currently only works with the aGRAPA and
+ONS-m builders.</p>
+</div>
+<div id="conditionally-bounded-scores-tick-loss" class="section level2">
+<h2>Conditionally bounded scores (Tick loss)</h2>
+<p>Some scoring rules, like tick loss for quantile forecasting, are
+unbounded globally but bounded <em>conditionally</em> based on the
+distance between the forecasts.</p>
+<p>For these rules, the strong SMCS requires a dynamically updating 3D
+array of bounds and betting fractions. The wrapper
+<code>smcs_compare()</code> handles this automatically when
+<code>scoring_rule = &quot;tick&quot;</code>, or you can construct the arrays
+manually using <code>build_quantile_betting_arrays()</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">7</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>tau <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>truth <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(T_sim)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>q_forecasts <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="at">M1 =</span> truth <span class="sc">+</span> <span class="fu">rnorm</span>(T_sim, <span class="at">sd =</span> <span class="fl">0.1</span>),    <span class="co"># accurate</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  <span class="at">M2 =</span> <span class="fu">rep</span>(<span class="dv">0</span>, T_sim),                     <span class="co"># uninformative</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  <span class="at">M3 =</span> truth <span class="sc">+</span> <span class="fu">rnorm</span>(T_sim, <span class="at">sd =</span> <span class="fl">0.1</span>) <span class="sc">+</span> <span class="dv">1</span> <span class="co"># biased</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>tick_cmp <span class="ot">&lt;-</span> <span class="fu">smcs_compare</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="at">forecasts    =</span> q_forecasts,</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>  <span class="at">outcomes     =</span> truth,</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="at">scoring_rule =</span> <span class="st">&quot;tick&quot;</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="at">tau          =</span> tau,</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="at">alpha        =</span> <span class="fl">0.05</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>)</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a><span class="co">#&gt; Warning in smcs_compare(forecasts = q_forecasts, outcomes = truth, scoring_rule</span></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="co">#&gt; = &quot;tick&quot;, : smcs_uniform_weak and smcs_weak are currently omitted for unbounded</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="co">#&gt; tick loss in this wrapper (require transformation).</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="fu">tail</span>(tick_cmp<span class="sc">$</span>smcs_strong)</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="co">#&gt;          M1    M2    M3</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="co">#&gt; [295,] TRUE FALSE FALSE</span></span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="co">#&gt; [296,] TRUE FALSE FALSE</span></span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="co">#&gt; [297,] TRUE FALSE FALSE</span></span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a><span class="co">#&gt; [298,] TRUE FALSE FALSE</span></span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="co">#&gt; [299,] TRUE FALSE FALSE</span></span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="co">#&gt; [300,] TRUE FALSE FALSE</span></span></code></pre></div>
+<p><code>smcs_uniform_weak</code> and <code>smcs_weak</code> are
+<code>NULL</code> here, since tick-loss score differences are only
+conditionally bounded, not uniformly bounded, while the current mixture
+and confidence-sequence implementations require a fixed uniform
+bound.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

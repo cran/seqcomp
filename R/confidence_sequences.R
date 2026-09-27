@@ -3,9 +3,9 @@
 # Anytime-valid confidence sequences for comparing two forecasters
 #
 # Implements:
-#   cs_hoeffding()  — Theorem 1 CR23: sub-Gaussian (Hoeffding-style) CS
-#   cs_bernstein()  — Theorem 2 CR23: empirical Bernstein (variance-adaptive) CS
-#   cs_asymptotic() — Appendix C, Eq. 55 CR23: asymptotic CS for unbounded differences
+#   cs_hoeffding()  — Theorem 1 CR24: sub-Gaussian (Hoeffding-style) CS
+#   cs_bernstein()  — Theorem 2 CR24: empirical Bernstein (variance-adaptive) CS
+#   cs_asymptotic() — EC.3, Eq. EC.29 CR24: asymptotic CS for unbounded differences
 #
 # All three return a data.frame with columns:
 #   t        — time index
@@ -23,12 +23,12 @@
 # m being the "peeking time".
 #
 # References:
-#   CR23  Choe & Ramdas (2023), Operations Research 72(4), 1368-1387
+#   CR24  Choe & Ramdas (2024), Operations Research 72(4), 1368-1387
 #   H21   Howard et al. (2021), Annals of Statistics 49(2), 1055-1080
 #   WS21  Waudby-Smith et al. (2021), Annals of Statistics 52(6), 2613-2640
 # =============================================================================
 
-#' Hoeffding-style confidence sequence (Theorem 1, Choe & Ramdas 2023)
+#' Hoeffding-style confidence sequence (Theorem 1, Choe & Ramdas 2024)
 #'
 #' Constructs a time-uniform confidence sequence for the mean score difference
 #' \eqn{\Delta_t = \frac{1}{t} \sum_{i=1}^t E[\hat{\delta_i} \mid \mathcal{F}_{i-1}]}.
@@ -42,7 +42,7 @@
 #'                difference is in `[a-b, b-a]`, so c = b - a.
 #'                Default: 1 (appropriate for Brier score differences in `[-1,1]`).
 #' @param v_opt   Numeric > 0. Intrinsic time at which the CS is tightest.
-#'                Default: 10 (recommended by CR23).
+#'                Default: 10 (recommended by CR24).
 #' @param boundary Character. "mixture" (default, recommended) or "stitching".
 #'
 #' @return data.frame with columns t, estimate, lower, upper.
@@ -129,7 +129,7 @@ cs_hoeffding <- function(scores1, scores2,
   )
 }
 
-#' Empirical Bernstein confidence sequence (Theorem 2, Choe & Ramdas 2023)
+#' Empirical Bernstein confidence sequence (Theorem 2, Choe & Ramdas 2024)
 #'
 #' Constructs a variance-adaptive time-uniform CS using empirical intrinsic
 #' time \eqn{\hat{V}_t = \sum_{i=1}^t (\hat{\delta}_i - \gamma_i)^2}.
@@ -147,7 +147,7 @@ cs_hoeffding <- function(scores1, scores2,
 #'                 Default: 2.
 #' @param v_opt    Numeric > 0. Optimal intrinsic time. Default: 10.
 #' @param boundary Character. "mixture" (default, GE mixture) or "stitching"
-#'                 (polynomial stitched) or "hardcoded" (CR23 example formula,
+#'                 (polynomial stitched) or "hardcoded" (CR24 example formula,
 #'                 only valid for alpha=0.05, c=1).
 #' @param gammas   Numeric vector or NULL. Predictable centering sequence.
 #'                 If NULL, constructed as lagged running mean (default).
@@ -220,8 +220,11 @@ cs_bernstein <- function(scores1, scores2,
   }
 
   # Empirical intrinsic time: V_hat_t = sum_{i=1}^t (hat_delta_i - gamma_i)^2
-  # Floor at 1 prevents log(0) in boundary formulas at t=1.
-  vs <- intrinsic_time(xs, gammas, floor = TRUE)
+  # The GE mixture is analytically valid at v=0.
+  # However, polynomial stitching and hardcoded boundaries require v >= 1
+  # to prevent NaN values in their log-based formulas.
+  needs_floor <- (boundary != "mixture")
+  vs <- intrinsic_time(xs, gammas, floor = needs_floor)
 
   # Alpha for one-sided vs two-sided
   alpha_use <- if (lcb_only || ucb_only) alpha else alpha / 2
@@ -234,7 +237,7 @@ cs_bernstein <- function(scores1, scores2,
     u_t <- ps_boundary(v = vs, alpha = alpha_use, v_opt = v_opt,
                        c = c, s = 1.4, eta = 2)
   } else {
-    # hardcoded: CR23 example formula (alpha=0.05, c=1 only)
+    # hardcoded: CR24 example formula (alpha=0.05, c=1 only)
     u_t <- cs_boundary_cr23_hardcoded(vs)
   }
 
@@ -253,7 +256,7 @@ cs_bernstein <- function(scores1, scores2,
   )
 }
 
-#' Asymptotic confidence sequence (Appendix C, Eq. 55, Choe & Ramdas 2023)
+#' Asymptotic confidence sequence (EC.3, Eq. EC.29, Choe & Ramdas 2024)
 #'
 #' **Asymptotic, not finite-sample**: coverage `>= 1 - alpha` holds only as
 #' `t -> infinity`. Valid without requiring bounded score differences —

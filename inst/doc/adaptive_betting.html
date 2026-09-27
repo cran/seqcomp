@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Choosing an Adaptive Betting Strategy: Temporal Dependence and Pathologies</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Choosing an Adaptive Betting Strategy:
+Temporal Dependence and Pathologies</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(seqcomp)</span></code></pre></div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><code>smcs_strong(method = &quot;betting&quot;)</code> tests the strong null
+through a product-form martingale, <span class="math inline">\(E_t =
+\prod_{r \le t} (1 + \lambda_r d_r)\)</span>, where <span class="math inline">\(d_r\)</span> is a score difference and <span class="math inline">\(c_r\)</span> is a predictable bound with <span class="math inline">\(|d_r| \le c_r/2\)</span>. Validity only requires
+that <span class="math inline">\(\lambda_r\)</span> be predictable and
+lie in <span class="math inline">\([0, 1/c_r]\)</span> at every round
+(see the <a href="smcs.html">SMCS vignette</a> for the underlying
+construction). Everything else, how large <span class="math inline">\(\lambda_r\)</span> actually is on a given round,
+is a design choice, and that choice determines how fast the test can
+reject a genuinely worse model.</p>
+<p><code>seqcomp</code> ships four ways to make that choice:</p>
+<ul>
+<li>the conservative fixed fraction <span class="math inline">\(\lambda_t = 1/(2c_t)\)</span>, the package
+default,</li>
+<li><code>lambda_betting_agrapa()</code>, an adaptation of Waudby-Smith
+and Ramdas (2024)’s aGRAPA plug-in,</li>
+<li><code>lambda_betting_ons()</code>, an adaptation of their ONS-m
+online Newton step,</li>
+<li><code>lambda_betting_quantile()</code>, Arnold et al. (2026)‘s own
+arctangent heuristic for quantile forecasts (referred to here as
+’Arnold’s heuristic’ for brevity, though derived jointly by Arnold,
+Gavrilopoulos, Schulz, and Ziegel, 2026).</li>
+</ul>
+<p>Arnold et al. (2026) do not define or recommend either aGRAPA or
+ONS-m; both are adaptations original to this package, built for a
+different null than the one Waudby-Smith and Ramdas (2024) designed them
+for (see the roxygen documentation for
+<code>lambda_betting_agrapa()</code> and
+<code>lambda_betting_ons()</code> for the derivation). None of the four
+rules is a strict improvement on the others. Each one responds
+differently to the observed history of the score differences, and
+therefore performs differently under different temporal structures. This
+vignette walks through four scenarios where that assumption breaks down
+for at least one method, drawn from the package’s systematic taxonomy of
+betting rules (<code>simulations/sim_06_systematic_taxonomy.R</code>,
+which also carries exhaustive Type-I error checks and hyperparameter
+sweeps not reproduced here).</p>
+<p>A fifth method, an oracle bet, appears in a few of the tables below
+purely as a ceiling. It uses the true, otherwise unobservable
+conditional mean and variance of the simulated data-generating process
+to solve directly for a highly optimized bet. It is there only to show
+how much room the adaptive rules leave on the table.</p>
+<p>As these scenarios will show, there is no single ‘best’ rule because
+these algorithms optimize different aspects of the sequential evidence
+process. Some maximize terminal wealth, others minimize
+time-to-rejection, and others trade away power to strictly limit maximum
+drawdown (the largest peak-to-trough drop in the e-process from a
+previous high). The choice depends entirely on which of these objectives
+matters most for your application.</p>
+</div>
+<div id="surfing-momentum" class="section level2">
+<h2>Surfing Momentum</h2>
+<p>Autocorrelated noise and a structural break are the same underlying
+problem at two different timescales: a running summary of the past is a
+poor guide to what happens next, either continuously, because rounds are
+correlated, or suddenly, because the mean has moved.
+<code>lambda_betting_agrapa()</code> and
+<code>lambda_betting_ons()</code> both track a running estimate, but
+differently, and that difference shows up clearly here.</p>
+<p>aGRAPA is a regularized cumulative average. Its plug-in mean and
+variance are <code>(prior + cumsum(...)) / (t + fake_obs)</code>, so a
+new observation’s weight on the estimate shrinks as <span class="math inline">\(1/t\)</span>. ONS-m instead takes a local Newton
+step every round, moving its bet in the direction of the current
+gradient and scaling the step by the accumulated curvature <span class="math inline">\(A_t\)</span>. It still pools information over the
+whole run through <span class="math inline">\(A_t\)</span>, but the
+direction of each step comes from the most recent observation, not from
+a long-run average.</p>
+<div id="a-single-path" class="section level3">
+<h3>A single path</h3>
+<p>This plot simulates one path with a mean that jumps from 0.10 to 0.40
+at <span class="math inline">\(t = 600\)</span>, and traces the
+resulting <span class="math inline">\(\lambda_t\)</span> for both
+rules.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2027</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>T_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>c_t <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">2</span>, T_sim)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>mu  <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">seq_len</span>(T_sim) <span class="sc">&lt;=</span> <span class="dv">600</span>, <span class="fl">0.10</span>, <span class="fl">0.40</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>d_t <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(mu <span class="sc">+</span> <span class="fu">rnorm</span>(T_sim), <span class="sc">-</span>c_t <span class="sc">/</span> <span class="dv">2</span>), c_t <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>lam_agrapa <span class="ot">&lt;-</span> <span class="fu">lambda_betting_agrapa</span>(d_t, <span class="at">c =</span> c_t)</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>lam_ons    <span class="ot">&lt;-</span> <span class="fu">lambda_betting_ons</span>(d_t, <span class="at">c =</span> c_t)</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">seq_len</span>(T_sim), lam_agrapa, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&quot;t&quot;</span>, <span class="at">ylab =</span> <span class="fu">expression</span>(lambda[t]),</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">&quot;One simulated path: betting fraction around a break at t = 600&quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">seq_len</span>(T_sim), lam_ons, <span class="at">col =</span> <span class="st">&quot;orange&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">600</span>, <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">&quot;aGRAPA&quot;</span>, <span class="st">&quot;ONS-m&quot;</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;orange&quot;</span>),</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="dv">1</span>, <span class="at">bty =</span> <span class="st">&quot;n&quot;</span>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<p>One path is not evidence. The tables below aggregate 200 runs of the
+same design (<code>T = 1000</code>, break at <code>t = 600</code>,
+<code>c_t = 2</code> throughout):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>simulate_dt <span class="ot">&lt;-</span> <span class="cf">function</span>(T_, mu_fn, c_fn, <span class="at">rho =</span> <span class="dv">0</span>, <span class="at">sd_scale =</span> <span class="dv">1</span>) {</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  mu  <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">seq_len</span>(T_), mu_fn, <span class="fu">numeric</span>(<span class="dv">1</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  c_t <span class="ot">&lt;-</span> <span class="fu">vapply</span>(<span class="fu">seq_len</span>(T_), c_fn, <span class="fu">numeric</span>(<span class="dv">1</span>))</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  eps <span class="ot">&lt;-</span> <span class="fu">numeric</span>(T_)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  eps[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">sd =</span> sd_scale)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>T_) {</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    eps[t] <span class="ot">&lt;-</span> rho <span class="sc">*</span> eps[t <span class="sc">-</span> <span class="dv">1</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">sd =</span> sd_scale <span class="sc">*</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">-</span> rho<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  }</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  d_t <span class="ot">&lt;-</span> <span class="fu">pmin</span>(<span class="fu">pmax</span>(mu <span class="sc">+</span> eps, <span class="sc">-</span>c_t <span class="sc">/</span> <span class="dv">2</span>), c_t <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">d_t =</span> d_t, <span class="at">c_t =</span> c_t)</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>}</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>mu_break   <span class="ot">&lt;-</span> <span class="cf">function</span>(t) <span class="cf">if</span> (t <span class="sc">&lt;=</span> <span class="dv">600</span>) <span class="fl">0.10</span> <span class="cf">else</span> <span class="fl">0.40</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>c_const_fn <span class="ot">&lt;-</span> <span class="cf">function</span>(t) <span class="fl">2.0</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>N_runs <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>T_sim  <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>lam_pre  <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, N_runs, <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">c</span>(<span class="st">&quot;aGRAPA&quot;</span>, <span class="st">&quot;ONS-m&quot;</span>)))</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>lam_post <span class="ot">&lt;-</span> lam_pre</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="cf">for</span> (sim <span class="cf">in</span> <span class="fu">seq_len</span>(N_runs)) {</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>  dat   <span class="ot">&lt;-</span> <span class="fu">simulate_dt</span>(T_sim, mu_break, c_const_fn, <span class="at">rho =</span> <span class="dv">0</span>, <span class="at">sd_scale =</span> <span class="dv">1</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>  lam_a <span class="ot">&lt;-</span> <span class="fu">lambda_betting_agrapa</span>(dat<span class="sc">$</span>d_t, <span class="at">c =</span> dat<span class="sc">$</span>c_t)</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  lam_o <span class="ot">&lt;-</span> <span class="fu">lambda_betting_ons</span>(dat<span class="sc">$</span>d_t, <span class="at">c =</span> dat<span class="sc">$</span>c_t)</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  lam_pre[sim, ]  <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">mean</span>(lam_a[<span class="dv">400</span><span class="sc">:</span><span class="dv">600</span>]),  <span class="fu">mean</span>(lam_o[<span class="dv">400</span><span class="sc">:</span><span class="dv">600</span>]))</span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  lam_post[sim, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">mean</span>(lam_a[<span class="dv">800</span><span class="sc">:</span><span class="dv">1000</span>]), <span class="fu">mean</span>(lam_o[<span class="dv">800</span><span class="sc">:</span><span class="dv">1000</span>]))</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>}</span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="fu">colMeans</span>(lam_pre)   <span class="co"># average bet just before the break</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="fu">colMeans</span>(lam_post)  <span class="co"># average bet well after the break</span></span></code></pre></div>
+<p>Mean betting fraction, averaged over the 200 runs, just before the
+break (<span class="math inline">\(t \in [400, 600]\)</span>) and well
+after it (<span class="math inline">\(t \in [800, 1000]\)</span>):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">Pre_break</th>
+<th align="right">Post_break</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Oracle</td>
+<td align="right">0.132</td>
+<td align="right">0.494</td>
+</tr>
+<tr class="even">
+<td align="left">ONS-m</td>
+<td align="right">0.139</td>
+<td align="right">0.353</td>
+</tr>
+<tr class="odd">
+<td align="left">aGRAPA</td>
+<td align="right">0.132</td>
+<td align="right">0.255</td>
+</tr>
+<tr class="even">
+<td align="left">Naive</td>
+<td align="right">0.250</td>
+<td align="right">0.250</td>
+</tr>
+</tbody>
+</table>
+<p>Naive does not move, by construction. Both adaptive rules raise their
+bet after the break, but ONS-m’s post-break fraction sits noticeably
+closer to the oracle’s than aGRAPA’s does.</p>
+<p>One could expect the opposite result, as ONS-m’s Hessian proxy <span class="math inline">\(A_t = 1 + \sum z_i^2\)</span> never decreases, so
+it seems reasonable to guess that a long run of pre-break history would
+leave ONS-m’s effective step size too small to react quickly once the
+break hit, a staleness that aGRAPA’s simpler running average would not
+share. Post-break wealth multipliers at four different break points
+refute such a guess directly:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Break t*</th>
+<th align="right">aGRAPA post-break multiplier</th>
+<th align="right">ONS-m post-break multiplier</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">100</td>
+<td align="right">1.975e+37</td>
+<td align="right">7.295e+37</td>
+</tr>
+<tr class="even">
+<td align="right">300</td>
+<td align="right">6.554e+24</td>
+<td align="right">8.168e+27</td>
+</tr>
+<tr class="odd">
+<td align="right">600</td>
+<td align="right">1.567e+11</td>
+<td align="right">6.591e+13</td>
+</tr>
+<tr class="even">
+<td align="right">800</td>
+<td align="right">2.920e+04</td>
+<td align="right">3.626e+05</td>
+</tr>
+</tbody>
+</table>
+<p>At every break point tested, ONS-m compounds more wealth after the
+break than aGRAPA does. The mechanical reason lies in how they update.
+aGRAPA’s mean and variance estimates retain the influence of the entire
+history, so a break at <span class="math inline">\(t = 800\)</span>
+still has to fight against 800 rounds of stale pre-break data. ONS-m’s
+step direction, by contrast, is local, as it reacts to the current
+gradient, even though its step size is scaled by the accumulated
+curvature <span class="math inline">\(A_t\)</span>. This allows it to
+pivot faster. The staleness hypothesis was a reasonable guess from the
+formula alone, but it does not survive running the two rules side by
+side.</p>
+<p>On the other hand, median maximum drawdown in the same 200-run design
+was 13.90 for aGRAPA against 18.13 for ONS-m: aGRAPA’s slower reaction
+also buys a gentler ride in this particular design, and ONS-m’s
+willingness to move its bet further, faster, is what produces the larger
+post-break payoff.</p>
+<p>Autocorrelated noise pushes in the same direction without any break
+at all. These runs generated an AR(1) noise process around a mean of
+0.05, and then clipped the resulting score difference to the admissible
+<span class="math inline">\([-c_t/2, c_t/2]\)</span> range at three
+levels of persistence:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>rho_vals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">0.9</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>N_runs <span class="ot">&lt;-</span> <span class="dv">200</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>T_sim  <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>get_mdd <span class="ot">&lt;-</span> <span class="cf">function</span>(e) <span class="fu">max</span>(<span class="fu">cummax</span>(e) <span class="sc">/</span> e)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="cf">for</span> (r <span class="cf">in</span> rho_vals) {</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  final_e <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, N_runs, <span class="dv">2</span>, <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">c</span>(<span class="st">&quot;aGRAPA&quot;</span>, <span class="st">&quot;ONS-m&quot;</span>)))</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  mdd     <span class="ot">&lt;-</span> final_e</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  <span class="cf">for</span> (sim <span class="cf">in</span> <span class="fu">seq_len</span>(N_runs)) {</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    dat   <span class="ot">&lt;-</span> <span class="fu">simulate_dt</span>(T_sim, <span class="at">mu_fn =</span> <span class="cf">function</span>(t) <span class="fl">0.05</span>, <span class="at">c_fn =</span> <span class="cf">function</span>(t) <span class="fl">2.0</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>                         <span class="at">rho =</span> r, <span class="at">sd_scale =</span> <span class="fl">1.0</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    lam_a <span class="ot">&lt;-</span> <span class="fu">lambda_betting_agrapa</span>(dat<span class="sc">$</span>d_t, <span class="at">c =</span> dat<span class="sc">$</span>c_t)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>    lam_o <span class="ot">&lt;-</span> <span class="fu">lambda_betting_ons</span>(dat<span class="sc">$</span>d_t, <span class="at">c =</span> dat<span class="sc">$</span>c_t)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>    e_a   <span class="ot">&lt;-</span> <span class="fu">cumprod</span>(<span class="dv">1</span> <span class="sc">+</span> lam_a <span class="sc">*</span> dat<span class="sc">$</span>d_t)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>    e_o   <span class="ot">&lt;-</span> <span class="fu">cumprod</span>(<span class="dv">1</span> <span class="sc">+</span> lam_o <span class="sc">*</span> dat<span class="sc">$</span>d_t)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>    final_e[sim, ] <span class="ot">&lt;-</span> <span class="fu">c</span>(e_a[T_sim], e_o[T_sim])</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>    mdd[sim, ]     <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">get_mdd</span>(e_a), <span class="fu">get_mdd</span>(e_o))</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  }</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>  <span class="co"># medians reported in the table below</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>}</span></code></pre></div>
+<table>
+<colgroup>
+<col width="9%" />
+<col width="25%" />
+<col width="24%" />
+<col width="20%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right"><span class="math inline">\(\rho\)</span></th>
+<th align="right">aGRAPA final wealth</th>
+<th align="left">ONS-m final wealth</th>
+<th align="left">aGRAPA drawdown</th>
+<th align="left">ONS-m drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.0</td>
+<td align="right">0.44</td>
+<td align="left">0.36</td>
+<td align="left">11.52</td>
+<td align="left">26.29</td>
+</tr>
+<tr class="even">
+<td align="right">0.5</td>
+<td align="right">0.80</td>
+<td align="left">43.6</td>
+<td align="left">75.22</td>
+<td align="left">72.71</td>
+</tr>
+<tr class="odd">
+<td align="right">0.9</td>
+<td align="right">1.08</td>
+<td align="left">1.15852e+12</td>
+<td align="left">98,600.77</td>
+<td align="left">30,731.16</td>
+</tr>
+</tbody>
+</table>
+<p>(Naive ends near zero at every <span class="math inline">\(\rho\)</span> tested under this weak, mean-0.05
+signal, and the oracle’s final wealth is orders of magnitude larger
+still, since it knows the true mean and variance directly.)</p>
+<p>Under i.i.d. noise (<span class="math inline">\(\rho = 0.0\)</span>),
+neither adaptive method compounds meaningfully, both end below where
+they started, and aGRAPA has the lower drawdown here. Once real
+persistence enters at <span class="math inline">\(\rho = 0.5\)</span>,
+ONS-m’s final wealth overtakes aGRAPA’s by roughly 54 times, and at
+<span class="math inline">\(\rho = 0.9\)</span> the gap is no longer a
+multiple, but a difference in scale. Under this specific simulation
+design, if the score difference stream carries strong serial
+correlation, ONS-m’s local gradient updating proved to be a much more
+powerful default than aGRAPA’s pooled estimates.</p>
+</div>
+</div>
+<div id="the-micro-variance-trap" class="section level2">
+<h2>The Micro-Variance Trap</h2>
+<p><code>lambda_betting_quantile()</code>’s bound <span class="math inline">\(c_t = 2\max(\tau, 1-\tau)|p_t - q_t|\)</span>
+scales with the distance between the two forecasts, which shifts the
+focus to quantile forecasts evaluated under tick loss. When two models
+are nearly identical, which is common once a Sequential Model Confidence
+Set has narrowed to its final few survivors, <span class="math inline">\(c_t\)</span> collapses toward zero, and the naive
+rule’s ceiling <span class="math inline">\(\lambda_t = 1/(2c_t)\)</span>
+explodes in the opposite direction.</p>
+<p>Tier B, Test 4 of the taxonomy pushes this to an extreme: two median
+forecasters (<span class="math inline">\(\tau = 0.5\)</span>) that
+differ by only <span class="math inline">\(\pm 0.001\)</span> around the
+same GARCH-simulated series.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>simulate_garch <span class="ot">&lt;-</span> <span class="cf">function</span>(T_, <span class="at">omega =</span> <span class="fl">0.05</span>, <span class="at">alpha =</span> <span class="fl">0.15</span>, <span class="at">beta =</span> <span class="fl">0.80</span>) {</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  y <span class="ot">&lt;-</span> sigma2 <span class="ot">&lt;-</span> <span class="fu">numeric</span>(T_)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  sigma2[<span class="dv">1</span>] <span class="ot">&lt;-</span> omega <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> alpha <span class="sc">-</span> beta)</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  y[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2[<span class="dv">1</span>]))</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="cf">for</span> (t <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span>T_) {</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>    sigma2[t] <span class="ot">&lt;-</span> omega <span class="sc">+</span> alpha <span class="sc">*</span> y[t <span class="sc">-</span> <span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> beta <span class="sc">*</span> sigma2[t <span class="sc">-</span> <span class="dv">1</span>]</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>    y[t] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2[t]))</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  }</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">y =</span> y, <span class="at">sigma =</span> <span class="fu">sqrt</span>(sigma2))</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>}</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2029</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>T_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>dgp <span class="ot">&lt;-</span> <span class="fu">simulate_garch</span>(T_sim)</span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>q_oracle <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, T_sim)</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a>q_micro  <span class="ot">&lt;-</span> q_oracle <span class="sc">+</span> <span class="fl">0.001</span> <span class="sc">*</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>), T_sim <span class="sc">/</span> <span class="dv">2</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a>d_t <span class="ot">&lt;-</span> <span class="fu">tick_loss</span>(q_oracle, dgp<span class="sc">$</span>y, <span class="at">tau =</span> <span class="fl">0.5</span>) <span class="sc">-</span> <span class="fu">tick_loss</span>(q_micro, dgp<span class="sc">$</span>y, <span class="at">tau =</span> <span class="fl">0.5</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a>delta_lag1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">head</span>(d_t, <span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a>bnds <span class="ot">&lt;-</span> <span class="fu">lambda_betting_quantile</span>(q_oracle, q_micro, <span class="at">tau =</span> <span class="fl">0.5</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a>                                <span class="at">delta_hat_lag1 =</span> delta_lag1)</span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a>c_t <span class="ot">&lt;-</span> <span class="fu">pmax</span>(bnds<span class="sc">$</span>c_t, <span class="fl">1e-8</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a>lam_naive  <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">2</span> <span class="sc">*</span> c_t)</span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>lam_arnold <span class="ot">&lt;-</span> <span class="fu">pmin</span>(bnds<span class="sc">$</span>lambda_t, <span class="dv">1</span> <span class="sc">/</span> c_t)</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>lam_agrapa <span class="ot">&lt;-</span> <span class="fu">lambda_betting_agrapa</span>(d_t, <span class="at">c =</span> c_t)</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>lam_ons    <span class="ot">&lt;-</span> <span class="fu">lambda_betting_ons</span>(d_t, <span class="at">c =</span> c_t)</span></code></pre></div>
+<p>The average bound over the run was <span class="math inline">\(c_t
+\approx 0.001\)</span>, putting the naive ceiling at <span class="math inline">\(\lambda \approx 500\)</span>. Average betting
+fraction actually played, and terminal wealth at <span class="math inline">\(t = 1000\)</span>:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">Average <span class="math inline">\(\lambda_t\)</span>
+played</th>
+<th align="right">Terminal wealth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Naive</td>
+<td align="right">500.0</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">Arnold</td>
+<td align="right">333.3</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="odd">
+<td align="left">aGRAPA</td>
+<td align="right">5.0</td>
+<td align="right">0.2</td>
+</tr>
+<tr class="even">
+<td align="left">ONS-m</td>
+<td align="right">70.8</td>
+<td align="right">0.0</td>
+</tr>
+</tbody>
+</table>
+<p>In this run, naive, Arnold’s heuristic, and ONS-m all played very
+large bets relative to the optimal fraction and ended with essentially
+zero wealth. ONS-m’s average bet (70.8) was much lower than naive’s, but
+still vastly more aggressive than aGRAPA’s, which was enough to trigger
+catastrophic volatility drag. aGRAPA is the only method that retained
+non-negligible wealth.</p>
+<p>The reason traces to the fact that aGRAPA contains an explicit
+<code>prior_variance</code> regularization term that keeps its plug-in
+denominator away from zero even when the empirical signal is tiny. The
+other three betting rules do not impose this kind of variance
+regularization, allowing their bets to escalate dangerously in
+high-noise, low-signal regimes.</p>
+<p>Riding the ceiling is fragile in a specific, checkable way. A bet at
+exactly <span class="math inline">\(\lambda = 1/c\)</span> multiplies
+wealth by <span class="math inline">\(1 + (1/c)(-c/2) = 1/2\)</span> on
+the single worst possible draw, confirmed directly on a deliberately
+constructed single-shock path elsewhere in the taxonomy script: aGRAPA
+and ONS-m each lost exactly 50% of their wealth on a maximal adverse
+observation while parked at that ceiling, while naive, betting more
+conservatively at <span class="math inline">\(\lambda = 1/(2c)\)</span>,
+lost only 25%. Algorithms that persistently play very large fractions,
+as naive, Arnold’s heuristic, and ONS-m all did on this path, pay that
+price over and over.</p>
+</div>
+<div id="volatility-clustering" class="section level2">
+<h2>Volatility Clustering</h2>
+<p>Tier B, Test 3 keeps the same GARCH structure but removes the
+microscopic bound: one model tracks the true conditional median exactly,
+the other forecasts a constant 0.5 regardless of what the volatility
+process is doing (same harness as above, with
+<code>q_static &lt;- rep(0.5, T_sim)</code> in place of
+<code>q_micro</code>). As volatility clusters, the score difference
+swings hard in both directions before eventually favoring the correct
+forecaster.</p>
+<p>Terminal wealth and maximum drawdown at <span class="math inline">\(t
+= 1000\)</span>:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">Terminal wealth</th>
+<th align="right">Maximum drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Naive</td>
+<td align="right">1.207e+16</td>
+<td align="right">19.11</td>
+</tr>
+<tr class="even">
+<td align="left">Arnold</td>
+<td align="right">9.728e+12</td>
+<td align="right">5.51</td>
+</tr>
+<tr class="odd">
+<td align="left">aGRAPA</td>
+<td align="right">1.465e+15</td>
+<td align="right">65.23</td>
+</tr>
+<tr class="even">
+<td align="left">ONS-m</td>
+<td align="right">9.792e+14</td>
+<td align="right">69.90</td>
+</tr>
+</tbody>
+</table>
+<p>Arnold’s heuristic ends this run with roughly a thousand times less
+wealth than naive, aGRAPA, or ONS-m, and it has, by a wide margin, the
+smallest drawdown of the four. aGRAPA and ONS-m both compound faster and
+both pay for it with drawdowns an order of magnitude larger than
+Arnold’s. Because their bet sizes are driven by running variance
+estimates that lag behind sudden GARCH volatility spikes, they over-bet
+into the whipsaw. Arnold’s heuristic recomputes its bet directly from
+the current spread between the two forecasts on every round, without
+accumulating a running summary of the past at all, so it reacts
+immediately when a volatility spike passes and the spread narrows again.
+It behaves like a shock absorber rather than a wealth-maximizer.</p>
+<p>This matches the broader pattern from the taxonomy: Arnold’s
+heuristic, purpose-built for the smooth, slowly varying, mean-reverting
+structure of the quantile forecasts it was designed around, is a strong
+choice exactly there, but it gives up compounding wealth in exchange for
+that stability once the process gets choppier. None of the four methods
+showed inflated Type-I error in the same GARCH setting under an exact
+null (identically noisy trackers, <span class="math inline">\(\tau =
+0.5\)</span>): naive rejected 3.6% of the time, Arnold 3.0%, aGRAPA
+2.2%, and ONS-m 2.6%, all at or under the nominal 5% level, so the
+choice here is genuinely about power and drawdown, not validity.</p>
+</div>
+<div id="the-cost-of-multiplicity" class="section level2">
+<h2>The Cost of Multiplicity</h2>
+<p>Everything so far compares two models. <code>smcs_strong()</code>
+extends the same betting martingale to <span class="math inline">\(m\)</span> models via closed testing: for each
+model <span class="math inline">\(i\)</span>, an intersection e-process
+<span class="math inline">\(E_{i\cdot,t}\)</span> averages the pairwise
+e-processes against all <span class="math inline">\(m - 1\)</span>
+competitors, and a Vovk-Wang merge (<code>vovk_wang_merge()</code>)
+adjusts <span class="math inline">\(E_{i\cdot,t}\)</span> for the
+multiplicity of testing every model against every other model at once.
+The adjusted value <span class="math inline">\(E^\star_{i\cdot,t}\)</span> is a minimum over
+subsets of competitors, and the full set is always one candidate subset,
+so <span class="math inline">\(E^\star_{i\cdot,t}\)</span> can never
+exceed the plain average across all <span class="math inline">\(m -
+1\)</span> pairwise e-processes. Adding more models whose pairwise
+e-processes carry little or no evidence pulls that average down and
+delays rejection. No choice of <span class="math inline">\(\lambda_t\)</span> changes this; it is a property
+of the closed-testing average itself.</p>
+<p>A deterministic construction makes the mechanism visible without any
+noise: one model that fails every seventh round (a stand-in for a weekly
+seasonal shock) against a competitor that never fails, diluted by a
+growing number of models that fail every round and carry no information
+at all.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>T_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>alpha <span class="ot">&lt;-</span> <span class="fl">0.10</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>sundays <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">7</span>, T_sim, <span class="at">by =</span> <span class="dv">7</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>m_vals <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">30</span>, <span class="dv">49</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="cf">for</span> (m_curr <span class="cf">in</span> m_vals) {</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  scores_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow =</span> T_sim, <span class="at">ncol =</span> m_curr)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  scores_mat[, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fl">1.0</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  scores_mat[sundays, <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="fl">0.0</span>   <span class="co"># fails every seventh round</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  scores_mat[, <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="fl">1.0</span>          <span class="co"># never fails</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="cf">if</span> (m_curr <span class="sc">&gt;</span> <span class="dv">2</span>) scores_mat[, <span class="dv">3</span><span class="sc">:</span>m_curr] <span class="ot">&lt;-</span> <span class="fl">0.0</span>   <span class="co"># uninformative decoys</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  C_mat <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fl">2.0</span>, <span class="at">nrow =</span> m_curr, <span class="at">ncol =</span> m_curr)</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  lam_agrapa <span class="ot">&lt;-</span> <span class="fu">build_agrapa_betting_array</span>(scores_mat, <span class="at">c_mat =</span> C_mat, <span class="at">period =</span> <span class="dv">7</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>  lam_ons    <span class="ot">&lt;-</span> <span class="fu">build_ons_betting_array</span>(scores_mat, <span class="at">c_mat =</span> C_mat, <span class="at">period =</span> <span class="dv">7</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>  res_agrapa <span class="ot">&lt;-</span> <span class="fu">smcs_strong</span>(scores_mat, <span class="at">alpha =</span> alpha, <span class="at">method =</span> <span class="st">&quot;betting&quot;</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>                            <span class="at">c_param =</span> C_mat, <span class="at">lambda_param =</span> lam_agrapa)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  res_ons    <span class="ot">&lt;-</span> <span class="fu">smcs_strong</span>(scores_mat, <span class="at">alpha =</span> alpha, <span class="at">method =</span> <span class="st">&quot;betting&quot;</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>                            <span class="at">c_param =</span> C_mat, <span class="at">lambda_param =</span> lam_ons)</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="co"># round of exclusion for model 1 reported below</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>}</span></code></pre></div>
+<p><code>period = 7</code> conditions each adaptive rule on its own
+day-of-week sub-stream instead of pooling across all seven days at once,
+the same construction used for the periodic seasonal example in the <a href="smcs.html">SMCS vignette</a>; without it, the rules fail to react
+to the weekly pattern for the same pooling reason discussed above. Round
+at which the seasonal model is excluded, as <span class="math inline">\(m\)</span> grows:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right"><span class="math inline">\(m\)</span></th>
+<th align="right">aGRAPA (period 7)</th>
+<th align="right">ONS-m (period 7)</th>
+<th align="right">Naive</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">63</td>
+<td align="right">63</td>
+<td align="right">98</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">84</td>
+<td align="right">84</td>
+<td align="right">140</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">105</td>
+<td align="right">105</td>
+<td align="right">182</td>
+</tr>
+<tr class="even">
+<td align="right">30</td>
+<td align="right">119</td>
+<td align="right">119</td>
+<td align="right">203</td>
+</tr>
+<tr class="odd">
+<td align="right">49</td>
+<td align="right">126</td>
+<td align="right">126</td>
+<td align="right">217</td>
+</tr>
+</tbody>
+</table>
+<p>aGRAPA and ONS-m tie exactly here, since the DGP is deterministic and
+the periodic wrapper removes the timing advantage that separated them
+under noise. Naive falls behind at every value of <span class="math inline">\(m\)</span>, and the gap widens as <span class="math inline">\(m\)</span> grows: 35 rounds at <span class="math inline">\(m = 2\)</span>, 91 rounds at <span class="math inline">\(m = 49\)</span>.</p>
+<p>A stochastic version of the same design, run 50 times per value of
+<span class="math inline">\(m\)</span> with an analytically derived, not
+data-peeked, predictable bound, gives the median rejection round:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right"><span class="math inline">\(m\)</span></th>
+<th align="right">aGRAPA (median <span class="math inline">\(t\)</span>)</th>
+<th align="right">ONS-m (median <span class="math inline">\(t\)</span>)</th>
+<th align="left">Naive (median <span class="math inline">\(t\)</span>)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="right">217.0</td>
+<td align="right">280.0</td>
+<td align="left">497</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">301.0</td>
+<td align="right">420.0</td>
+<td align="left">836.5</td>
+</tr>
+<tr class="odd">
+<td align="right">25</td>
+<td align="right">346.5</td>
+<td align="right">439.0</td>
+<td align="left">868.5</td>
+</tr>
+<tr class="even">
+<td align="right">49</td>
+<td align="right">339.5</td>
+<td align="right">472.5</td>
+<td align="left">&gt;1,000</td>
+</tr>
+</tbody>
+</table>
+<p>The overall pattern under noise is the same: increasing <span class="math inline">\(m\)</span> generally delays rejection, with the
+largest degradation for the naive rule. aGRAPA’s slight dip at <span class="math inline">\(m=49\)</span> should be interpreted as
+finite-sample noise across the 50 runs.</p>
+<p>The dilution mechanism is exact enough to verify arithmetically.
+aGRAPA’s terminal wealth hits the package’s internal clip_max
+computational safeguard of <span class="math inline">\(10^7\)</span> per
+pairwise e-process. Once the closed-testing average sets in, that
+ceiling gets divided almost exactly by <span class="math inline">\(m -
+1\)</span>:</p>
+<table>
+<colgroup>
+<col width="4%" />
+<col width="30%" />
+<col width="30%" />
+<col width="34%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right"><span class="math inline">\(m\)</span></th>
+<th align="left">Arnold: round of exclusion</th>
+<th align="left">aGRAPA: round of exclusion</th>
+<th align="left">aGRAPA final adjusted e-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">2</td>
+<td align="left">&gt;8,000</td>
+<td align="left">1,786</td>
+<td align="left">1e+07</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="left">&gt;8,000</td>
+<td align="left">2,516</td>
+<td align="left">1,111,111</td>
+</tr>
+<tr class="odd">
+<td align="right">25</td>
+<td align="left">&gt;8,000</td>
+<td align="left">2,540</td>
+<td align="left">416,666.9</td>
+</tr>
+<tr class="even">
+<td align="right">49</td>
+<td align="left">&gt;8,000</td>
+<td align="left">2,561</td>
+<td align="left">208,333.6</td>
+</tr>
+</tbody>
+</table>
+<p>At every <span class="math inline">\(m\)</span> tested, aGRAPA’s
+final adjusted e-value matches <span class="math inline">\(10^7/(m-1)\)</span> to the precision shown: the
+closed-testing average is literally dividing the maximum possible
+pairwise evidence among the competitors it is pooled against. Arnold’s
+heuristic never rejects within the 8000-round horizon in this setting, a
+separate finding from the volatility-clustering result above and
+consistent with it: Arnold’s heuristic does not accumulate wealth
+quickly against a slow-moving, well-separated competitor over a long
+horizon, and the dilution tax here only makes that slower accumulation
+worse.</p>
+<p>Choosing a good <span class="math inline">\(\lambda_t\)</span> rule
+buys real power, as the sections above show, but it does not undo the
+cost of testing more models at once. That cost is a property of the
+closed-testing correction, not of the betting rule sitting underneath
+it, and it sets a practical limit on how large a candidate pool you
+should evaluate at a fixed horizon, regardless of which betting rule you
+pick. Exhaustive Type-I error checks and hyperparameter sensitivity
+sweeps for all four rules, across constant, time-varying, and periodic
+bound regimes, are in
+<code>simulations/sim_06_systematic_taxonomy.R</code> in the package
+source and are not reproduced in this vignette.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>No single rule dominates across every regime tested. As a rough
+guide:</p>
+<table>
+<colgroup>
+<col width="53%" />
+<col width="46%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Situation observed in these simulations</th>
+<th align="left">Reasonable starting point</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Autocorrelated or abrupt mean shift</td>
+<td align="left">ONS-m</td>
+</tr>
+<tr class="even">
+<td align="left">Nearly identical models (tiny <span class="math inline">\(c_t\)</span>)</td>
+<td align="left">aGRAPA</td>
+</tr>
+<tr class="odd">
+<td align="left">Strong volatility clustering</td>
+<td align="left">Naive or Arnold’s heuristic (if drawdown matters)</td>
+</tr>
+<tr class="even">
+<td align="left">Smooth, slowly varying, mean-reverting quantile
+forecasts</td>
+<td align="left">Arnold’s heuristic</td>
+</tr>
+</tbody>
+</table>
+<p>Whatever rule you choose, expect rejection to take longer as the
+candidate pool <span class="math inline">\(m\)</span> grows. That cost
+comes from the closed-testing correction in <code>smcs_strong()</code>,
+not from the betting rule, and no choice of <span class="math inline">\(\lambda_t\)</span> removes it.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

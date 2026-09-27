@@ -1,8 +1,8 @@
 # =============================================================================
 # winkler.R
-# Proposition 4 pipeline: Winkler score extension for unbounded scoring rules
+# Proposition EC.4 pipeline: Winkler score extension for unbounded scoring rules
 #
-# Choe & Ramdas (2023), Proposition 4:
+# Choe & Ramdas (2024), Proposition EC.4:
 #   For a proper scoring rule S on binary outcomes, the normalised Winkler
 #   score w(p, q, y) is bounded above by 1 and satisfies the sub-exponential
 #   condition required for Theorems 2 and 3 with scale c = 2.
@@ -12,7 +12,7 @@
 #   winkler_etest() — e-process for Winkler scores
 #   winkler_compare() — combined pipeline returning both
 #
-# IMPORTANT RESTRICTIONS (from Proposition 4 and Section G of CR23):
+# IMPORTANT RESTRICTIONS (from Proposition EC.4 and EC.7 of CR24):
 #   1. Binary outcomes only: y in {0, 1}, p, q in (0, 1).
 #   2. The CS is ONE-SIDED (upper bound only) because the Winkler score is
 #      unbounded below. Output: (-Inf, U_t].
@@ -21,10 +21,10 @@
 #   4. NOT applicable to QLIKE or other continuous-outcome scoring rules.
 #
 # References:
-#   CR23  Choe & Ramdas (2023), Operations Research 72(4)
+#   CR24  Choe & Ramdas (2024), Operations Research 72(4)
 # =============================================================================
 
-#' One-sided empirical Bernstein CS for Winkler scores (Proposition 4)
+#' One-sided empirical Bernstein CS for Winkler scores (Proposition EC.4)
 #'
 #' Applies the Winkler normalisation and constructs a one-sided upper
 #' confidence sequence for the mean Winkler score W_t = (1/t)*sum w_i.
@@ -121,7 +121,7 @@ winkler_cs <- function(p, q, y,
   cs
 }
 
-#' E-process for Winkler scores (Proposition 4 + Theorem 3)
+#' E-process for Winkler scores (Proposition EC.4 + Theorem 3)
 #'
 #' Tests whether the mean Winkler score W_t >= 0 for all t.
 #' A rejection provides time-uniform evidence that forecaster 1 (p)
@@ -166,7 +166,7 @@ winkler_etest <- function(p, q, y,
 
   ws <- winkler_score(p, q, y, base_score = base_score)
 
-  # Proposition 4 applies because the Winkler score is bounded above by 1.
+  # Proposition EC.4 applies because the Winkler score is bounded above by 1.
   # To use the lower-bounded sub-exponential e-process machinery, negate it:
   #   x_i = -w_i >= -1
   xs <- -ws
@@ -214,7 +214,7 @@ winkler_etest_rejections <- function(ep, alpha = 0.05) {
   )
 }
 
-#' Full Winkler comparison pipeline (Proposition 4)
+#' Full Winkler comparison pipeline (Proposition EC.4)
 #'
 #' Convenience wrapper that computes Winkler scores, one-sided CS, and
 #' e-process in a single call.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/confidence_sequences.R
 \name{cs_asymptotic}
 \alias{cs_asymptotic}
-\title{Asymptotic confidence sequence (Appendix C, Eq. 55, Choe & Ramdas 2023)}
+\title{Asymptotic confidence sequence (EC.3, Eq. EC.29, Choe & Ramdas 2024)}
 \usage{
 cs_asymptotic(scores1, scores2, alpha = 0.05, t_star = NULL)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/confidence_sequences.R
 \name{cs_hoeffding}
 \alias{cs_hoeffding}
-\title{Hoeffding-style confidence sequence (Theorem 1, Choe & Ramdas 2023)}
+\title{Hoeffding-style confidence sequence (Theorem 1, Choe & Ramdas 2024)}
 \usage{
 cs_hoeffding(
   scores1,
@@ -27,7 +27,7 @@ difference is in \verb{[a-b, b-a]}, so c = b - a.
 Default: 1 (appropriate for Brier score differences in \verb{[-1,1]}).}
 
 \item{v_opt}{Numeric > 0. Intrinsic time at which the CS is tightest.
-Default: 10 (recommended by CR23).}
+Default: 10 (recommended by CR24).}
 
 \item{boundary}{Character. "mixture" (default, recommended) or "stitching".}
 }

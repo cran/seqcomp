@@ -58,7 +58,7 @@ For h >= 2:
 5. Unroll to original time scale
 
 The period-wise ("pw") null is less conservative than the standard ("w")
-null but tests a different (weaker) hypothesis. See CR23 Section 4.4.
+null but tests a different (weaker) hypothesis. See CR24 Section 4.4.
 }
 \examples{
 scores1 <- c(-0.04, -0.09, -0.01, -0.16, -0.04, -0.09)

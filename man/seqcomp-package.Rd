@@ -7,7 +7,9 @@
 \description{
 \code{seqcomp} provides tools for comparing probabilistic forecasters
 sequentially, following the anytime-valid framework of Choe and Ramdas
-(2024).
+(2024). For three or more forecasters, the package additionally implements
+Sequential Model Confidence Sets following Arnold, Gavrilopoulos, Schulz
+and Ziegel (2026).
 }
 \details{
 The package is built around the score difference
@@ -15,7 +17,7 @@ The package is built around the score difference
 \deqn{\hat{\delta}_t = S(p_t, y_t) - S(q_t, y_t),}
 
 where scores are positively oriented, so larger values are better. Positive
-score differences favour forecaster \code{p}; negative score differences favour
+score differences favor forecaster \code{p}; negative score differences favor
 forecaster \code{q}.
 }
 \section{Main workflow}{
@@ -49,6 +51,21 @@ forecasts, see \code{\link[=eprocess_lag]{eprocess_lag()}}. For predictable time
 \code{\link[=eprocess_predictable]{eprocess_predictable()}}.
 }
 
+\section{Multiple forecasters}{
+
+For three or more candidate forecasters, use \code{\link[=smcs_compare]{smcs_compare()}}
+as the main entry point. It extends the pairwise workflow above to a
+Sequential Model Confidence Set (SMCS): the running set of models not yet
+shown to underperform some competitor. Lower-level access is available via
+\code{\link[=smcs_strong]{smcs_strong()}} (strong or uniformly weak null, via closure testing) and
+\code{\link[=smcs_weak]{smcs_weak()}} (time-varying weak null, via joint confidence sequences),
+with \code{\link[=vovk_wang_merge]{vovk_wang_merge()}} and \code{\link[=eprocess_betting]{eprocess_betting()}} as supporting building
+blocks. To construct optimal adaptive betting fractions for the strong null,
+use \code{\link[=build_agrapa_betting_array]{build_agrapa_betting_array()}} or \code{\link[=build_ons_betting_array]{build_ons_betting_array()}} for
+constant-bound scores, and \code{\link[=build_quantile_betting_arrays]{build_quantile_betting_arrays()}} for conditionally
+bounded rules such as tick loss.
+}
+
 \section{Winkler scores}{
 
 For binary probability forecasts with unbounded base scores, use
@@ -57,10 +74,18 @@ For binary probability forecasts with unbounded base scores, use
 }
 
 \references{
+Arnold, S., Gavrilopoulos, G., Schulz, B. and Ziegel, J. (2026). Sequential
+model confidence sets. Journal of the Royal Statistical Society Series B:
+Statistical Methodology, qkag066.
+
 Choe, Y. J. and Ramdas, A. (2024). Comparing Sequential Forecasters.
 Operations Research, 72(4), 1368-1387.
 
 Howard, S. R., Ramdas, A., McAuliffe, J. and Sekhon, J. (2021).
 Time-uniform, nonparametric, nonasymptotic confidence sequences.
-The Annals of Statistics, 49(2).
+The Annals of Statistics, 49(2), 1055-1080.
+
+Waudby-Smith, I. and Ramdas, A. (2024). Estimating means of bounded
+random variables by betting. Journal of the Royal Statistical Society
+Series B: Statistical Methodology, 86(1), 1-27.
 }

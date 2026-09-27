@@ -19,7 +19,7 @@ Numeric vector of e-values >= 0.
 }
 \description{
 Converts anytime-valid p-values to e-values using the mixture or simple
-calibrator, as used in CR23 Section 4.4.
+calibrator, as used in CR24 Section 4.4.
 }
 \details{
 Mixture calibrator (default, matches Python comparecast behaviour):

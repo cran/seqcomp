@@ -8,7 +8,7 @@ rho_from_vopt(v_opt = 10, alpha = 0.025)
 }
 \arguments{
 \item{v_opt}{Numeric > 0. Intrinsic time at which the boundary is tightest.
-Recommended default from CR23: 10.}
+Recommended default from CR24: 10.}
 
 \item{alpha}{Numeric in (0,1). Significance level (one-sided).
 For a two-sided boundary at level alpha, pass alpha/2 here.}

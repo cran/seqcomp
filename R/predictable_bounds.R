@@ -1,12 +1,12 @@
 # =============================================================================
 # predictable_bounds.R
-# Proposition 7: e-process with time-varying predictable bounds
+# Proposition EC.7: e-process with time-varying predictable bounds
 #
 # When score differences have bounds that vary over time but are known
 # one step ahead (F_{t-1}-measurable), the fixed-c assumption of Theorems
 # 2 & 3 can be replaced by a predictable sequence (c_i).
 #
-# Proposition 7 CR23:
+# Proposition EC.7 CR24:
 #   If |hat_delta_i| <= c_i/2 and (c_i) is strictly positive and
 #   F_{i-1}-measurable, then for fixed lambda in [0, 1/c_0):
 #
@@ -23,10 +23,10 @@
 #     c_i must be bounded from above for the test to have power.
 #
 # References:
-#   CR23  Choe & Ramdas (2023), Operations Research 72(4), Proposition 7
+#   CR24  Choe & Ramdas (2024), Operations Research 72(4), Proposition EC.7
 # =============================================================================
 
-#' Fixed-lambda e-process with predictable bounds (Proposition 7)
+#' Fixed-lambda e-process with predictable bounds (Proposition EC.7)
 #'
 #' Constructs a valid e-process when score difference bounds vary over time
 #' but are predictable (known at time i-1 before observing hat_delta_i).

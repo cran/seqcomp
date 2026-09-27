@@ -3,7 +3,7 @@
 # Scoring rules for probabilistic forecast evaluation
 #
 # All scoring rules are POSITIVELY ORIENTED: higher values = better forecast.
-# This matches the CR23 convention:
+# This matches the CR24 convention:
 #   hat_delta_t = S(p_t, y_t) - S(q_t, y_t)
 # is positive when forecaster p outperforms forecaster q.
 #
@@ -26,7 +26,7 @@
 #
 # References:
 #   GR07  Gneiting & Raftery (2007), JASA 102(477)
-#   CR23  Choe & Ramdas (2023), Operations Research 72(4)
+#   CR24  Choe & Ramdas (2024), Operations Research 72(4)
 #   JKL19 Jordan, Krueger & Lerch (2019), Journal of Statistical Software, 90(12)
 # =============================================================================
 
@@ -229,18 +229,18 @@ log_score <- function(p, y, eps = 1e-15) {
 #' Computes the positively oriented (negated) tick/quantile loss
 #' (Koenker & Bassett, 1978).
 #'
-#' @param q     Numeric vector. Quantile forecasts at level alpha.
+#' @param q     Numeric vector. Quantile forecasts at level tau.
 #' @param y     Numeric vector. Realised outcomes.
-#' @param alpha Numeric in (0,1). Quantile level.
+#' @param tau Numeric in (0,1). Quantile level.
 #'
 #' @return Numeric vector of negated tick loss scores. Higher = better.
 #'
 #' @details
 #' The standard tick loss is
-#' \deqn{\rho_\alpha(u) = u \left(\alpha - \mathbb{1}(u < 0)\right),}
-#' where \eqn{u = y - q_\alpha} is the forecast error. This is loss-oriented
+#' \deqn{\rho_\tau(u) = u \left(\tau - \mathbb{1}(u < 0)\right),}
+#' where \eqn{u = y - q_\tau} is the forecast error. This is loss-oriented
 #' (lower = better), so the function negates it:
-#' \deqn{S_T(q, y; \alpha) = -(y - q)\left(\alpha - \mathbb{1}(y < q)\right).}
+#' \deqn{S_T(q, y; \tau) = -(y - q)\left(\tau - \mathbb{1}(y < q)\right).}
 #'
 #' Tick loss is unbounded on general real-valued outcomes. Bounds derived from
 #' an empirical data range are ex-post and do not provide theorem-valid
@@ -253,13 +253,13 @@ log_score <- function(p, y, eps = 1e-15) {
 #' @examples
 #' q <- c(1.0, 1.5, 2.0)
 #' y <- c(1.2, 1.4, 2.3)
-#' tick_loss(q, y, alpha = 0.5)
+#' tick_loss(q, y, tau = 0.5)
 #'
 #' @export
-tick_loss <- function(q, y, alpha) {
-  stopifnot(alpha > 0, alpha < 1, length(q) == length(y))
+tick_loss <- function(q, y, tau) {
+  stopifnot(tau > 0, tau < 1, length(q) == length(y))
   u <- y - q
-  -(u * (alpha - as.numeric(u < 0)))
+  -(u * (tau - as.numeric(u < 0)))
 }
 
 #' Negated QLIKE score for variance forecasts
@@ -310,7 +310,7 @@ qlike_score <- function(sigma2_hat, sigma2) {
 #'
 #' Normalises the score difference S(p,y) - S(q,y) by the maximum possible
 #' score difference given the forecaster ordering, mapping the result to
-#' `(-Inf, 1]` (Proposition 4, Choe & Ramdas 2023). Used to apply Theorems 2 & 3
+#' `(-Inf, 1]` (Proposition EC.4, Choe & Ramdas 2024). Used to apply Theorems 2 & 3
 #' to unbounded scoring rules on binary outcomes.
 #'
 #' @param p         Numeric vector in (0,1). Forecasts from model 1.
@@ -332,12 +332,12 @@ qlike_score <- function(sigma2_hat, sigma2) {
 #' The lower bound is problem-dependent (depends on how extreme p and q can
 #' be). For a two-sided CS via Corollary 2, the user must establish a finite
 #' lower bound analytically. If no finite lower bound can be guaranteed, use
-#' the one-sided (upper) CS only, as in the CR23 MLB experiments.
+#' the one-sided (upper) CS only, as in the CR24 MLB experiments.
 #'
 #' @section When to use:
 #' Strictly limited to binary outcomes `y` in `{0, 1}` and probability
 #' forecasts `p`, `q` in `(0, 1)`. Not applicable to QLIKE or other
-#' continuous-outcome scoring rules. See CR23 Section G for discussion.
+#' continuous-outcome scoring rules. See CR24 EC.7 for discussion.
 #'
 #' For use in Theorems 2 & 3: upper bound = 1 implies c/2 = 1, so use `c = 2`
 #' in all GE boundary and e-process calls.
@@ -378,7 +378,7 @@ winkler_score <- function(p, q, y,
 
   result <- num / denom_safe
 
-  # Enforce 0/0 := 0 convention from CR23
+  # Enforce 0/0 := 0 convention from CR24
   result[abs(num) < eps & abs(denom) < eps] <- 0
 
   return(result)

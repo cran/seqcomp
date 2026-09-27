@@ -38,7 +38,7 @@ For two forecasters `p` and `q`, the pointwise score difference is
 \hat{\delta}_t = S(p_t, y_t) - S(q_t, y_t).
 \]
 
-Positive values favour forecaster `p`; negative values favour forecaster `q`.
+Positive values favor forecaster `p`; negative values favor forecaster `q`.
 
 ## A simple binary forecasting example
 
@@ -65,8 +65,9 @@ q <- rep(0.50, n)
 head(data.frame(y = y, p = p, q = q))
 ```
 
-This toy example is deliberately simple. In a real application, `p` and `q`
-would come from two forecasting models, analysts, or institutions.
+This toy example is deliberately simple and outcome-conditioned. In a real application, 
+`p` and `q` would come from two forecasting models, analysts, or institutions, before 
+observing `y`.
 
 ## Compare the forecasts
 
@@ -112,9 +113,9 @@ lines(cmp$t, cmp$upper, lty = 2)
 abline(h = 0, col = "gray50")
 ```
 
-If the whole interval lies above zero, the data favour `p`.
+If the whole interval lies above zero, the data favor `p`.
 
-If the whole interval lies below zero, the data favour `q`.
+If the whole interval lies below zero, the data favor `q`.
 
 If the interval still contains zero, the comparison is not yet decisive at the
 chosen level.
@@ -239,6 +240,12 @@ wcmp <- winkler_compare(p, q, y)
 
 names(wcmp)
 ```
+
+## Comparing more than two forecasters
+
+This vignette covers exactly two forecasters. For three or more, see
+`vignette("smcs", package = "seqcomp")`, which extends the same anytime-valid
+guarantees to Sequential Model Confidence Sets via `smcs_compare()`.
 
 ## Practical guidance
 

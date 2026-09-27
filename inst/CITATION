@@ -3,14 +3,8 @@ bibentry(
   title   = "seqcomp: Sequential Comparison of Probabilistic Forecasts",
   author  = person("Akbar", "Alasgarli"),
   year    = "2026",
-  note    = paste(
-    "R package version 0.1.0.",
-    "The implementation was developed with reference to the arXiv version of",
-    "Choe and Ramdas (2024), which contains appendix material with additional",
-    "formulae, proofs, and definitions used in the implementation.",
-    "The main citation refers to the published Operations Research version."
-  ),
-  url     = "https://github.com/alasgarliakbar/seqcomp"
+  note    = "R package version 0.2.0.",
+  url     = "https://cran.r-project.org/package=seqcomp"
 )
 
 bibentry(
@@ -30,6 +24,36 @@ bibentry(
 
 bibentry(
   bibtype = "Article",
+  title   = "Sequential model confidence sets",
+  author  = c(
+    person("Sebastian", "Arnold"),
+    person("Georgios", "Gavrilopoulos"),
+    person("Benedikt", "Schulz"),
+    person("Johanna", "Ziegel")
+  ),
+  journal = "Journal of the Royal Statistical Society Series B: Statistical Methodology",
+  year    = "2026",
+  pages   = "qkag066",
+  doi     = "10.1093/jrsssb/qkag066"
+)
+
+bibentry(
+  bibtype = "Article",
+  title   = "Estimating means of bounded random variables by betting",
+  author  = c(
+    person("Ian", "Waudby-Smith"),
+    person("Aaditya", "Ramdas")
+  ),
+  journal = "Journal of the Royal Statistical Society Series B: Statistical Methodology",
+  year    = "2024",
+  volume  = "86",
+  number  = "1",
+  pages   = "1--27",
+  doi     = "10.1093/jrsssb/qkad009"
+)
+
+bibentry(
+  bibtype = "Article",
   title   = "Time-uniform, nonparametric, nonasymptotic confidence sequences",
   author  = c(
     person("Steven R.", "Howard"),
@@ -41,6 +65,7 @@ bibentry(
   year    = "2021",
   volume  = "49",
   number  = "2",
+  pages   = "1055--1080",
   doi     = "10.1214/20-AOS1991"
 )
 
@@ -56,6 +81,7 @@ bibentry(
   journal = "Probability Surveys",
   year    = "2020",
   volume  = "17",
+  pages   = "257--317",
   doi     = "10.1214/18-PS321"
 )
 
@@ -90,5 +116,6 @@ bibentry(
   year    = "2024",
   volume  = "52",
   number  = "6",
+  pages   = "2613--2640",
   doi     = "10.1214/24-AOS2408"
 )

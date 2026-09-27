@@ -2,7 +2,7 @@
 % Please edit documentation in R/confidence_sequences.R
 \name{cs_bernstein}
 \alias{cs_bernstein}
-\title{Empirical Bernstein confidence sequence (Theorem 2, Choe & Ramdas 2023)}
+\title{Empirical Bernstein confidence sequence (Theorem 2, Choe & Ramdas 2024)}
 \usage{
 cs_bernstein(
   scores1,
@@ -31,7 +31,7 @@ Default: 2.}
 \item{v_opt}{Numeric > 0. Optimal intrinsic time. Default: 10.}
 
 \item{boundary}{Character. "mixture" (default, GE mixture) or "stitching"
-(polynomial stitched) or "hardcoded" (CR23 example formula,
+(polynomial stitched) or "hardcoded" (CR24 example formula,
 only valid for alpha=0.05, c=1).}
 
 \item{gammas}{Numeric vector or NULL. Predictable centering sequence.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/winkler.R
 \name{winkler_etest}
 \alias{winkler_etest}
-\title{E-process for Winkler scores (Proposition 4 + Theorem 3)}
+\title{E-process for Winkler scores (Proposition EC.4 + Theorem 3)}
 \usage{
 winkler_etest(
   p,

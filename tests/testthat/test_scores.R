@@ -53,9 +53,9 @@ test_that("log_score eps clipping prevents -Inf", {
 
 test_that("tick_loss is finite for exceedance and non-exceedance", {
   q_test <- -0.02
-  alpha_test <- 0.05
-  expect_true(is.finite(tick_loss(q_test, -0.05, alpha_test)))
-  expect_true(is.finite(tick_loss(q_test,  0.01, alpha_test)))
+  tau_test <- 0.05
+  expect_true(is.finite(tick_loss(q_test, -0.05, tau_test)))
+  expect_true(is.finite(tick_loss(q_test,  0.01, tau_test)))
 })
 
 test_that("tick_loss is 0 when forecast equals outcome exactly", {

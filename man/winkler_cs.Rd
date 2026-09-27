@@ -2,7 +2,7 @@
 % Please edit documentation in R/winkler.R
 \name{winkler_cs}
 \alias{winkler_cs}
-\title{One-sided empirical Bernstein CS for Winkler scores (Proposition 4)}
+\title{One-sided empirical Bernstein CS for Winkler scores (Proposition EC.4)}
 \usage{
 winkler_cs(
   p,

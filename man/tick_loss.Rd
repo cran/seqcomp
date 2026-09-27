@@ -4,14 +4,14 @@
 \alias{tick_loss}
 \title{Negated tick loss for quantile forecasts}
 \usage{
-tick_loss(q, y, alpha)
+tick_loss(q, y, tau)
 }
 \arguments{
-\item{q}{Numeric vector. Quantile forecasts at level alpha.}
+\item{q}{Numeric vector. Quantile forecasts at level tau.}
 
 \item{y}{Numeric vector. Realised outcomes.}
 
-\item{alpha}{Numeric in (0,1). Quantile level.}
+\item{tau}{Numeric in (0,1). Quantile level.}
 }
 \value{
 Numeric vector of negated tick loss scores. Higher = better.
@@ -22,10 +22,10 @@ Computes the positively oriented (negated) tick/quantile loss
 }
 \details{
 The standard tick loss is
-\deqn{\rho_\alpha(u) = u \left(\alpha - \mathbb{1}(u < 0)\right),}
-where \eqn{u = y - q_\alpha} is the forecast error. This is loss-oriented
+\deqn{\rho_\tau(u) = u \left(\tau - \mathbb{1}(u < 0)\right),}
+where \eqn{u = y - q_\tau} is the forecast error. This is loss-oriented
 (lower = better), so the function negates it:
-\deqn{S_T(q, y; \alpha) = -(y - q)\left(\alpha - \mathbb{1}(y < q)\right).}
+\deqn{S_T(q, y; \tau) = -(y - q)\left(\tau - \mathbb{1}(y < q)\right).}
 
 Tick loss is unbounded on general real-valued outcomes. Bounds derived from
 an empirical data range are ex-post and do not provide theorem-valid
@@ -38,6 +38,6 @@ has smaller tick loss, hence a better quantile forecast, than forecaster \code{q
 \examples{
 q <- c(1.0, 1.5, 2.0)
 y <- c(1.2, 1.4, 2.3)
-tick_loss(q, y, alpha = 0.5)
+tick_loss(q, y, tau = 0.5)
 
 }

@@ -25,11 +25,11 @@ Numeric vector of boundary values (cumulative-sum scale).
 }
 \description{
 Alternative boundary for both Theorem 1 and Theorem 2 constructions,
-included for completeness and for cross-checking CR23 Table results.
+included for completeness and for cross-checking CR24 Table results.
 }
 \details{
 This is \strong{not} the recommended primary boundary: the CM/GE mixture
-boundaries (\code{cm_boundary()}, \code{ge_boundary()}) are tighter in CR23 and are
+boundaries (\code{cm_boundary()}, \code{ge_boundary()}) are tighter in CR24 and are
 used by default throughout \code{seqcomp}. Use \code{ps_boundary()} only when you
 specifically need the polynomial-stitched construction.
 }

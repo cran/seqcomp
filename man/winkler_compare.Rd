@@ -2,7 +2,7 @@
 % Please edit documentation in R/winkler.R
 \name{winkler_compare}
 \alias{winkler_compare}
-\title{Full Winkler comparison pipeline (Proposition 4)}
+\title{Full Winkler comparison pipeline (Proposition EC.4)}
 \usage{
 winkler_compare(
   p,

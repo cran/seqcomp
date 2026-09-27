@@ -17,7 +17,7 @@ containing the score differences for that stream.
 }
 \description{
 For lag \code{h}, the k-th stream (\verb{k = 1, ..., h}) contains indices
-\eqn{\{k,\, k+h,\, k+2h,\, \ldots\}}, following the CR23 convention.
+\eqn{\{k,\, k+h,\, k+2h,\, \ldots\}}, following the CR24 convention.
 }
 \examples{
   split_streams(1:10, h = 3)

@@ -9,7 +9,7 @@
 #   3. optionally construct a confidence sequence,
 #   4. optionally construct two one-sided e-processes.
 #
-# The wrapper is intentionally restricted to the Choe & Ramdas framework
+# The wrapper is intentionally restricted to the Choe & Ramdas (2024) framework
 # implemented elsewhere in the package.
 # =============================================================================
 

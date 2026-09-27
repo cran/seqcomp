@@ -139,6 +139,44 @@ test_that("ge_boundary inverts ge_mixture to hit 1/alpha", {
   }
 })
 
+test_that("ge_boundary avoids overflow warnings on small-c inputs", {
+  alpha <- 0.025
+  rho <- rho_from_vopt(v_opt = 1, alpha = alpha)
+  v_test <- c(0, 1, 10, 1000)
+
+  u_ge <- NULL
+
+  expect_no_warning({
+    u_ge <- ge_boundary(
+      v = v_test,
+      alpha = alpha,
+      rho = rho,
+      c = 0.01
+    )
+  })
+
+  expect_true(all(is.finite(u_ge)))
+
+  m_at_boundary <- vapply(
+    seq_along(v_test),
+    function(i) {
+      seqcomp:::ge_mixture(
+        s = u_ge[[i]],
+        v = v_test[[i]],
+        rho = rho,
+        c = 0.01
+      )
+    },
+    numeric(1)
+  )
+
+  expect_equal(
+    m_at_boundary,
+    rep(1 / alpha, length(v_test)),
+    tolerance = 1e-5
+  )
+})
+
 test_that("GE radius (u/t) shrinks as t grows", {
   rho_ge2  <- rho_from_vopt(v_opt = 10, alpha = 0.025)
   t_test   <- c(1, 5, 10, 50, 100)
@@ -160,7 +198,7 @@ test_that("ps_boundary returns finite, positive, non-decreasing values", {
   expect_true(all(diff(u_ps) >= 0))
 })
 
-test_that("hardcoded CR23 formula matches the expected value at v=10", {
+test_that("hardcoded CR24 EC.27 formula matches the expected value at v=10", {
   hc_10 <- seqcomp:::cs_boundary_cr23_hardcoded(10)
   expect_lt(abs(hc_10 - 43.057), 0.01)
 })
